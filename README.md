@@ -48,6 +48,31 @@ python manage.py test apps          # engine unit tests, component-state tests, 
 python scripts/contrast.py          # WCAG contrast check of both colour themes
 ```
 
+## Deployment (Vercel + shared Postgres)
+
+Live: https://irriga-one.vercel.app (Vercel project `irriga`, function pinned to `dub1` next to the database).
+
+**Shared database, isolated schema.** The Supabase Postgres also hosts other apps (`public`, `drizzle`, `agroai`, `visionmirror`).
+This project lives only in its own **`irriga`** schema, under a restricted role `irriga_app` whose `search_path` is pinned to
+that schema. The role cannot read the other apps' tables (verified), so a bug or a bad migration here cannot touch them.
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Transaction pooler (port 6543), role `irriga_app`. Used at runtime. |
+| `DATABASE_URL_SESSION` | Session pooler (port 5432), same role. Used for migrations only (`DB_MODE=session`). |
+| `SECRET_KEY` | Generated with `python -c "import secrets; print(secrets.token_urlsafe(64))"`. |
+| `DEBUG`, `DEMO_MODE`, `ALLOWED_HOSTS` | `0`, `1`, `.vercel.app,localhost` in production. |
+
+```bash
+# migrate the remote schema (never run `flush`, never run tests against it: tests always use SQLite)
+ENV_FILE=.env.production DB_MODE=session python manage.py migrate
+ENV_FILE=.env.production DB_MODE=session python manage.py seed_demo
+vercel deploy --prod
+```
+
+Production demo accounts have **no usable password**: they are reachable only through the one-click demo entry, the demo
+admin entry is disabled, and the demo partner sees demo farms only.
+
 ## What is in it
 
 | Area | Where |

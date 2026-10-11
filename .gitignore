@@ -10,3 +10,6 @@ staticfiles/
 .env.*
 !.env.example
 scripts/lighthouse-*.json
+
+.vercel
+.env*
