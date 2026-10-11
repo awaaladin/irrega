@@ -4,7 +4,7 @@ from datetime import timedelta
 from unittest import mock
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from apps.accounts.models import ApiKey
@@ -131,3 +131,20 @@ class Landing(TestCase):
         u = User.objects.create_user(username="s@x.test", email="s@x.test", password="pw-12345678")
         self.client.force_login(u)
         self.assertContains(self.client.get("/"), "set up your first field")
+
+
+class DemoIsSafe(TestCase):
+    def test_demo_partner_never_sees_real_farms_and_admin_entry_is_not_a_superuser(self):
+        from apps.demo import services
+        from apps.partners.views import _org_farms
+
+        farmer, partner, admin, org = services._users()
+        real = User.objects.create_user(username="real@x.test", email="real@x.test", password="pw-12345678", organization=org)
+        Farm.objects.create(owner=real, name="Real farm", organization=org)
+        Farm.objects.create(owner=farmer, name="Demo farm", organization=org, is_demo=True)
+        names = set(_org_farms(partner).values_list("name", flat=True))
+        self.assertEqual(names, {"Demo farm"})
+
+    @override_settings(DEBUG=False)
+    def test_admin_demo_entry_is_closed_when_not_debugging(self):
+        self.assertEqual(self.client.get("/demo/enter/admin/").status_code, 404)

@@ -2,6 +2,7 @@
 import random
 from datetime import datetime, time, timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
@@ -45,20 +46,28 @@ SCENARIO_NDVI_DROP = {
 
 def _users():
     org, _ = Organization.objects.get_or_create(name="Cross River Farmers Cooperative", defaults={"kind": "Agricultural organisation"})
+    def secure(user):
+        # A known password on a public URL would be an open door. Locally you can sign in with it; anywhere else the
+        # demo accounts are reachable only through the one-click demo entry.
+        if settings.DEBUG:
+            user.set_password(DEMO_PASSWORD)
+        else:
+            user.set_unusable_password()
+        user.save()
+
     farmer, c = User.objects.get_or_create(username=DEMO_EMAIL, defaults=dict(email=DEMO_EMAIL, first_name="Etim", organization=org))
     if c:
-        farmer.set_password(DEMO_PASSWORD)
-        farmer.save()
+        secure(farmer)
         start_trial(farmer, days=45)
     partner, c = User.objects.get_or_create(username=PARTNER_EMAIL, defaults=dict(email=PARTNER_EMAIL, first_name="Ima", role="partner", organization=org))
     if c:
-        partner.set_password(DEMO_PASSWORD)
-        partner.save()
+        secure(partner)
         start_trial(partner, days=45, plan_code="partner")
-    admin, c = User.objects.get_or_create(username=ADMIN_EMAIL, defaults=dict(email=ADMIN_EMAIL, first_name="Admin", role="admin", is_staff=True, is_superuser=True))
+    # The demo "admin" is only for local development: never staff or superuser, so it cannot reach Django admin.
+    admin, c = User.objects.get_or_create(username=ADMIN_EMAIL, defaults=dict(email=ADMIN_EMAIL, first_name="Admin", role="admin",
+                                                                              is_staff=settings.DEBUG, is_superuser=settings.DEBUG))
     if c:
-        admin.set_password(DEMO_PASSWORD)
-        admin.save()
+        secure(admin)
     PilotCode.objects.get_or_create(code="CALABAR2026", defaults=dict(organization=org, trial_days=60))
     return farmer, partner, admin, org
 

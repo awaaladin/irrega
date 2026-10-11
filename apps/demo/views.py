@@ -15,6 +15,8 @@ BACKEND = "apps.accounts.backends.EmailOrPhoneBackend"
 def enter(request, who="farmer"):
     if not settings.DEMO_MODE:
         raise Http404
+    if who == "admin" and not settings.DEBUG:
+        raise Http404
     farmer, partner, admin = services.ensure_demo()
     user = {"farmer": farmer, "partner": partner, "admin": admin}.get(who, farmer)
     login(request, user, backend=BACKEND)

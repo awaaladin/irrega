@@ -16,7 +16,12 @@ from .services import farm_stats
 def _org_farms(user):
     if user.role == "admin" or user.is_superuser:
         return Farm.objects.all()
-    return Farm.objects.filter(organization=user.organization) if user.organization_id else Farm.objects.none()
+    if not user.organization_id:
+        return Farm.objects.none()
+    farms = Farm.objects.filter(organization=user.organization)
+    if user.username == "partner@irrigation.test":  # the public demo partner: demo data only
+        farms = farms.filter(is_demo=True)
+    return farms
 
 
 @login_required
