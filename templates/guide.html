@@ -1,0 +1,108 @@
+{% extends layout %}
+{% load ui %}
+{% block title %}Guide · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="grid gap-10 lg:grid-cols-[230px_1fr]">
+
+  {# contents #}
+  <nav aria-label="Guide contents" class="hidden lg:block">
+    <div class="sticky top-24 max-h-[calc(100dvh-8rem)] space-y-0.5 overflow-y-auto pr-2 text-sm">
+      <p class="eyebrow mb-2">In this guide</p>
+      {% for id, label in toc %}<a href="#{{ id }}" class="block rounded-md px-2 py-1.5 text-mute transition-colors hover:bg-raised hover:text-ink">{{ label }}</a>{% endfor %}
+    </div>
+  </nav>
+
+  <div class="min-w-0 space-y-14">
+    <header class="space-y-3">
+      <p class="eyebrow text-water">Guide</p>
+      <h1 class="text-[2rem] leading-tight sm:text-5xl">How to use Routine Irrigation Technology</h1>
+      <p class="max-w-prose text-lg text-mute">What each screen is for, what the numbers mean, and what to do when something looks off. Read it once, then keep it for later: it is always under <strong class="text-ink">Guide</strong> in the menu.</p>
+      <details class="card card-pad lg:hidden"><summary class="flex min-h-touch cursor-pointer items-center font-semibold">Jump to a section</summary>
+        <div class="mt-2 grid gap-1">{% for id, label in toc %}<a href="#{{ id }}" class="rounded-md px-2 py-2 text-mute hover:bg-sunken hover:text-ink">{{ label }}</a>{% endfor %}</div>
+      </details>
+    </header>
+
+    {# ---- quick start ---- #}
+    <section id="start" aria-labelledby="start-h" class="scroll-mt-24 space-y-4">
+      <h2 id="start-h" class="text-3xl">Your first 5 minutes</h2>
+      <ol class="space-y-3">
+        {% for title, text, ic in quickstart %}
+        <li class="card flex gap-4 p-4 sm:p-5">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-water/50 bg-water/10 text-water">{% icon ic %}</span>
+          <div><p class="font-display text-xl"><span class="num text-mute">{{ forloop.counter }}.</span> {{ title }}</p><p class="mt-1 max-w-prose text-[0.97rem] text-mute">{{ text|safe }}</p></div>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+
+    {# ---- daily routine ---- #}
+    <section id="daily" aria-labelledby="daily-h" class="scroll-mt-24 space-y-4">
+      <h2 id="daily-h" class="text-3xl">A daily routine</h2>
+      <p class="max-w-prose text-mute">It takes about two minutes. You do not need to open anything else.</p>
+      <ul class="grid gap-3 sm:grid-cols-2">
+        {% for title, text, ic in daily %}
+        <li class="card card-pad"><p class="flex items-center gap-2 font-semibold"><span class="text-water">{% icon ic "h-5 w-5" %}</span>{{ title }}</p><p class="mt-1.5 text-[0.97rem] text-mute">{{ text|safe }}</p></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    {# ---- the four decisions ---- #}
+    <section id="decisions" aria-labelledby="dec-h" class="scroll-mt-24 space-y-4">
+      <h2 id="dec-h" class="text-3xl">The four decisions</h2>
+      <p class="max-w-prose text-mute">Every decision has its own colour, icon and words, so you never rely on colour alone.</p>
+      <ul class="grid gap-3 sm:grid-cols-2">
+        <li class="card card-pad space-y-2">{% include "components/action_badge.html" with action="IRRIGATE_NOW" big=True %}<p class="text-[0.97rem] text-mute">The soil has already used up the water the crop can spare, and rain will not cover it. Water in the next cool window.</p></li>
+        <li class="card card-pad space-y-2">{% include "components/action_badge.html" with action="IRRIGATE_LATER_TODAY" big=True %}<p class="text-[0.97rem] text-mute">Fine right now but it will reach the limit by tonight. We give you the best window, usually late afternoon.</p></li>
+        <li class="card card-pad space-y-2">{% include "components/action_badge.html" with action="SKIP_TODAY" big=True %}<p class="text-[0.97rem] text-mute">The soil holds enough, or rain is likely to do the job. Skipping saves water and time, and protects roots from wet soil.</p></li>
+        <li class="card card-pad space-y-2">{% include "components/action_badge.html" with action="WATCH" big=True %}<p class="text-[0.97rem] text-mute">Something does not add up, for example the crop is losing greenness in already wet soil. Look for disease, pests, drainage or hunger in the soil.</p></li>
+      </ul>
+    </section>
+
+    {# ---- situations ---- #}
+    <section id="situations" aria-labelledby="sit-h" class="scroll-mt-24 space-y-4">
+      <h2 id="sit-h" class="text-3xl">When something looks off</h2>
+      <ul class="space-y-3">
+        {% for title, text, ic in situations %}
+        <li class="card flex gap-4 p-4 sm:p-5"><span class="mt-0.5 text-watch">{% icon ic %}</span><div><p class="font-semibold">{{ title }}</p><p class="mt-1 max-w-prose text-[0.97rem] text-mute">{{ text|safe }}</p></div></li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    {# ---- every screen ---- #}
+    <section id="screens" aria-labelledby="scr-h" class="scroll-mt-24 space-y-3">
+      <h2 id="scr-h" class="text-3xl">Every screen, explained</h2>
+      <p class="max-w-prose text-mute">For each screen: what it is for, what you will see, and what you can do there.</p>
+    </section>
+
+    {% for s in screens %}
+    <section id="{{ s.id }}" aria-labelledby="{{ s.id }}-h" class="card scroll-mt-24 overflow-hidden">
+      <div class="border-b border-line bg-sunken/50 px-5 py-4 sm:px-6">
+        <p class="eyebrow flex items-center gap-2 text-water">{% icon s.icon "h-4 w-4" %}{{ s.where|safe }}</p>
+        <h3 id="{{ s.id }}-h" class="mt-1 text-2xl">{{ s.title }}</h3>
+        <p class="mt-2 max-w-prose text-[1.02rem] text-mute">{{ s.purpose|safe }}</p>
+      </div>
+      <div class="grid gap-6 p-5 sm:p-6 md:grid-cols-2">
+        <div><h4 class="eyebrow mb-2">What you see</h4><ul class="space-y-2.5 text-[0.97rem]">{% for t in s.sees %}<li class="flex gap-2.5"><span class="mt-0.5 text-mute">{% icon "chevron-right" "h-4 w-4" %}</span><span>{{ t|safe }}</span></li>{% endfor %}</ul></div>
+        <div><h4 class="eyebrow mb-2">What you can do</h4><ul class="space-y-2.5 text-[0.97rem]">{% for t in s.does %}<li class="flex gap-2.5"><span class="mt-0.5 text-leaf">{% icon "check" "h-4 w-4" %}</span><span>{{ t|safe }}</span></li>{% endfor %}</ul></div>
+      </div>
+      {% if s.tip %}<p class="border-t border-line bg-water/5 px-5 py-3 text-sm sm:px-6"><strong>Good to know:</strong> {{ s.tip|safe }}</p>{% endif %}
+    </section>
+    {% endfor %}
+
+    <section id="words" aria-labelledby="words-h" class="scroll-mt-24 space-y-4">
+      <h2 id="words-h" class="text-3xl">Words you will meet</h2>
+      <dl class="grid gap-3 sm:grid-cols-2">{% for term, text in glossary %}<div class="card card-pad"><dt class="font-display text-lg">{{ term }}</dt><dd class="mt-1 text-[0.97rem] text-mute">{{ text }}</dd></div>{% endfor %}</dl>
+    </section>
+
+    <section id="honest" aria-labelledby="hon-h" class="card card-pad scroll-mt-24 space-y-3 border-watch/30">
+      <h2 id="hon-h" class="text-2xl">What we are honest about</h2>
+      <ul class="space-y-2 text-[0.97rem]">
+        <li class="flex gap-2.5"><span class="text-watch">{% icon "flag" "h-5 w-5" %}</span><span>Anything simulated is labelled <strong>Demo data</strong> or <strong>Simulated</strong>. We never show made-up readings as real.</span></li>
+        <li class="flex gap-2.5"><span class="text-watch">{% icon "flag" "h-5 w-5" %}</span><span>The advice is a transparent water-balance calculation, not a black box. It is a decision aid, not a guarantee. Your eyes on the crop still matter.</span></li>
+        <li class="flex gap-2.5"><span class="text-watch">{% icon "flag" "h-5 w-5" %}</span><span>When data is missing or old we say so and lower our confidence instead of pretending.</span></li>
+        <li class="flex gap-2.5"><span class="text-watch">{% icon "flag" "h-5 w-5" %}</span><span>Water saved is an estimate against a stated baseline: watering every day at the crop's daily need.</span></li>
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

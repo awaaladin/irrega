@@ -70,6 +70,7 @@ def design(request):
 @login_required
 def account(request):
     links = [
+        ("/guide/", "Guide: how to use this app", "info"),
         ("/billing/", "Plans and billing", "card"),
         ("/pilot/", "Pilot results", "chart"),
         ("/notifications/settings/", "Alert settings", "bell"),

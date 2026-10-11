@@ -7,6 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", farm_views.home, name="today"),
     path("about/", farm_views.landing, name="about"),
+    path("guide/", farm_views.guide, name="guide"),
     path("", include("apps.core.urls")),
     path("accounts/", include("apps.accounts.urls")),
     path("farms/", include("apps.farms.urls")),

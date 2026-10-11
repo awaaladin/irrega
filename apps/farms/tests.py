@@ -116,16 +116,29 @@ class Landing(TestCase):
     def test_signed_out_visitor_sees_the_landing_page_not_a_redirect(self):
         r = self.client.get("/")
         self.assertEqual(r.status_code, 200)
-        self.assertContains(r, "Every screen, explained")
-        for title in ("Today: one decision for each field", "Why this? The reasons, in plain words", "Override and snooze", "Partner dashboard and System", "Account and display"):
-            self.assertContains(r, title)
+        self.assertContains(r, "Read the full guide")
         self.assertEqual(self.client.get("/about/").status_code, 200)
 
-    def test_every_toc_link_has_a_target(self):
-        from apps.farms.landing_content import SCREENS, TOC
+    def test_guide_explains_every_screen_and_how_to_use_it(self):
+        r = self.client.get("/guide/")  # public: works signed out
+        self.assertEqual(r.status_code, 200)
+        for text in ("Your first 5 minutes", "A daily routine", "When something looks off", "Every screen, explained",
+                     "Today: one decision for each field", "Why this? The reasons, in plain words", "Override and snooze",
+                     "Partner dashboard and System", "Account and display", "Words you will meet"):
+            self.assertContains(r, text)
 
-        ids = {s["id"] for s in SCREENS} | {"how", "decisions", "screens", "words", "honest"}
-        self.assertEqual({i for i, _ in TOC} - ids, set())
+    def test_guide_is_inside_the_dashboard_when_signed_in(self):
+        u = User.objects.create_user(username="g@x.test", email="g@x.test", password="pw-12345678")
+        self.client.force_login(u)
+        r = self.client.get("/guide/")
+        self.assertContains(r, 'aria-current="page"')  # the sidebar marks Guide as the current page
+        self.assertContains(r, "Today")
+
+    def test_every_toc_link_has_a_target(self):
+        from apps.farms.landing_content import SCREENS, TOC_GUIDE
+
+        ids = {s["id"] for s in SCREENS} | {"start", "daily", "decisions", "situations", "screens", "words", "honest"}
+        self.assertEqual({i for i, _ in TOC_GUIDE} - ids, set())
 
     def test_signed_in_farmer_still_gets_today(self):
         u = User.objects.create_user(username="s@x.test", email="s@x.test", password="pw-12345678")

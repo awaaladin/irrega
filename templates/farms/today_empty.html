@@ -26,6 +26,7 @@
 
   <div class="flex flex-wrap gap-3">
     <a href="{{ next_url }}" x-press class="btn btn-primary">{% if has_farm %}Add your first field{% else %}Add your farm{% endif %}</a>
+    <a href="{% url 'guide' %}" class="btn btn-ghost">{% icon "info" %}Read the guide</a>
     {% if DEMO_MODE %}<a href="{% url 'demo:enter' %}" class="btn btn-ghost">{% icon "play" %}Or look around the demo farm first</a>{% endif %}
   </div>
 </div>

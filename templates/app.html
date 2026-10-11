@@ -21,6 +21,7 @@
         {% if item.label == 'Alerts' and unread_count %}<span class="num ml-auto rounded-full bg-laterite px-2 text-xs font-semibold text-onaccent" x-show="!collapsed">{{ unread_count }}</span>{% endif %}
       </a>
       {% endfor %}
+      <a href="{% url 'guide' %}" x-press class="flex min-h-touch items-center gap-3 rounded-md px-3 text-sm font-medium {% if active == 'Guide' %}bg-raised text-ink shadow-raised{% else %}text-mute hover:bg-raised/60 hover:text-ink{% endif %}" {% if active == 'Guide' %}aria-current="page"{% endif %}>{% icon "info" %}<span x-show="!collapsed">Guide</span></a>
       {% if request.user.is_partner %}
       <a href="/partners/" class="flex min-h-touch items-center gap-3 rounded-md px-3 text-sm font-medium {% if active == 'Partner' %}bg-raised text-ink{% else %}text-mute hover:text-ink{% endif %}">{% icon "users" %}<span x-show="!collapsed">Partner</span></a>
       {% endif %}
@@ -46,6 +47,7 @@
       {% if has_demo_farm %}{% include "components/demo_badge.html" %}{% endif %}
       {% include "components/language_toggle.html" %}
       {% include "components/theme_toggle.html" %}
+      <a href="{% url 'guide' %}" class="btn btn-quiet min-w-touch px-2" aria-label="Guide: how to use this app" title="Guide">{% icon "info" %}</a>
       <a href="/notifications/" class="btn btn-quiet relative min-w-touch px-2" aria-label="Alerts{% if unread_count %}, {{ unread_count }} unread{% endif %}">
         {% icon "bell" %}{% if unread_count %}<span class="absolute right-1.5 top-2 h-2 w-2 rounded-full bg-laterite breathe-dot"></span>{% endif %}
       </a>

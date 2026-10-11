@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load ui %}
+{# Plain shell for signed-out visitors (the Guide uses this when you are not signed in) #}
+{% block body %}
+<header class="sticky top-0 z-nav border-b border-line bg-base/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2 md:px-8">
+    <a href="{% url 'about' %}" class="flex items-center gap-2" aria-label="Routine Irrigation Technology, home">
+      {% include "components/logo.html" with size="h-9 w-9" %}<span class="hidden font-display text-lg sm:inline">Routine Irrigation</span>
+    </a>
+    <nav class="ml-auto flex items-center gap-2" aria-label="Account">
+      {% include "components/theme_toggle.html" %}
+      <a href="{% url 'accounts:login' %}" class="btn btn-ghost min-h-[40px] text-sm">Sign in</a>
+      <a href="{% url 'accounts:register' %}" class="btn btn-primary min-h-[40px] text-sm">Start free pilot</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="mx-auto w-full max-w-6xl px-4 py-8 md:px-8" tabindex="-1">{% block content %}{% endblock %}</main>
+{% endblock %}

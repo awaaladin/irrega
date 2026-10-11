@@ -32,22 +32,14 @@
         <div class="mt-7 flex flex-wrap gap-3">
           {% if DEMO_MODE %}<a href="{% url 'demo:enter' %}" x-press class="btn btn-water min-h-[48px] px-5">{% icon "play" %}Explore a sample farm</a>{% endif %}
           <a href="{% url 'accounts:register' %}" x-press class="btn btn-primary min-h-[48px] px-5">Start your free pilot</a>
-          <a href="#screens" class="btn btn-ghost min-h-[48px] px-5">See every screen</a>
+          <a href="{% url 'guide' %}" class="btn btn-ghost min-h-[48px] px-5">How to use it</a>
         </div>
         {% if DEMO_MODE %}<p class="mt-4 flex items-center gap-2 text-sm text-mute">{% include "components/demo_badge.html" %} The sample farm uses simulated sensors and a scenario forecast. It is labelled everywhere it appears.</p>{% endif %}
       </div>
     </div>
   </section>
 
-  <div class="mx-auto grid max-w-6xl gap-10 px-4 pb-20 md:px-8 lg:grid-cols-[220px_1fr]">
-
-    {# ---------- table of contents ---------- #}
-    <nav aria-label="On this page" class="hidden lg:block">
-      <div class="sticky top-20 space-y-1 text-sm">
-        <p class="eyebrow mb-2">On this page</p>
-        {% for id, label in toc %}<a href="#{{ id }}" class="block rounded-md px-2 py-1.5 text-mute hover:bg-raised hover:text-ink">{{ label }}</a>{% endfor %}
-      </div>
-    </nav>
+  <div class="mx-auto max-w-5xl px-4 pb-20 md:px-8">
 
     <div class="min-w-0 space-y-16">
 
@@ -74,39 +66,25 @@
         </ul>
       </section>
 
-      {# ---------- screens ---------- #}
-      <section id="screens" aria-labelledby="scr-h" class="scroll-mt-24 space-y-3">
-        <h2 id="scr-h" class="text-3xl">Every screen, explained</h2>
-        <p class="max-w-prose text-mute">Here is what each screen is for, what you will see on it, and what you can do there. Open the sample farm to try each one.</p>
-      </section>
-
-      {% for s in screens %}
-      <section id="{{ s.id }}" aria-labelledby="{{ s.id }}-h" class="card scroll-mt-24 overflow-hidden">
-        <div class="border-b border-line bg-sunken/50 px-5 py-4 sm:px-6">
-          <p class="eyebrow flex items-center gap-2 text-water">{% icon s.icon "h-4 w-4" %}{{ s.where|safe }}</p>
-          <h3 id="{{ s.id }}-h" class="mt-1 text-2xl">{{ s.title }}</h3>
-          <p class="mt-2 max-w-prose text-[1.02rem] text-mute">{{ s.purpose }}</p>
-        </div>
-        <div class="grid gap-6 p-5 sm:p-6 md:grid-cols-2">
+      {# ---------- screens: short overview; the full guide lives in the app ---------- #}
+      <section id="screens" aria-labelledby="scr-h" class="scroll-mt-24 space-y-5">
+        <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h4 class="eyebrow mb-2">What you see</h4>
-            <ul class="space-y-2.5 text-[0.97rem]">{% for t in s.sees %}<li class="flex gap-2.5"><span class="mt-0.5 text-mute">{% icon "chevron-right" "h-4 w-4" %}</span><span>{{ t|safe }}</span></li>{% endfor %}</ul>
+            <h2 id="scr-h" class="text-3xl">What is inside</h2>
+            <p class="mt-1 max-w-prose text-mute">A short tour. The full guide, with what to do on each screen and what to do when something looks off, is built into the app.</p>
           </div>
-          <div>
-            <h4 class="eyebrow mb-2">What you can do</h4>
-            <ul class="space-y-2.5 text-[0.97rem]">{% for t in s.does %}<li class="flex gap-2.5"><span class="mt-0.5 text-leaf">{% icon "check" "h-4 w-4" %}</span><span>{{ t|safe }}</span></li>{% endfor %}</ul>
-          </div>
+          <a href="{% url 'guide' %}" class="btn btn-ghost">{% icon "info" %}Read the full guide</a>
         </div>
-        {% if s.tip %}<p class="border-t border-line bg-water/5 px-5 py-3 text-sm sm:px-6"><strong>Good to know:</strong> {{ s.tip|safe }}</p>{% endif %}
-      </section>
-      {% endfor %}
-
-      {# ---------- glossary ---------- #}
-      <section id="words" aria-labelledby="words-h" class="scroll-mt-24 space-y-5">
-        <h2 id="words-h" class="text-3xl">Words you will meet</h2>
-        <dl class="grid gap-4 sm:grid-cols-2">
-          {% for term, text in glossary %}<div class="card card-pad"><dt class="font-display text-lg">{{ term }}</dt><dd class="mt-1 text-[0.97rem] text-mute">{{ text }}</dd></div>{% endfor %}
-        </dl>
+        <ul class="grid gap-3 sm:grid-cols-2">
+          {% for s in screens %}
+          <li>
+            <a href="{% url 'guide' %}#{{ s.id }}" x-press class="card card-pad block h-full transition-colors hover:border-water/50">
+              <p class="flex items-center gap-2 font-semibold"><span class="text-water">{% icon s.icon "h-5 w-5" %}</span>{{ s.title }}</p>
+              <p class="mt-1.5 text-sm text-mute">{{ s.purpose|safe|truncatewords_html:24 }}</p>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
       </section>
 
       {# ---------- honesty ---------- #}

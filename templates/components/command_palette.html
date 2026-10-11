@@ -1,7 +1,7 @@
 {% load ui %}
 {# CommandPalette: Ctrl/Cmd+K. Arrow keys, Enter, Esc. Focus is trapped in the dialog. #}
 <div x-cloak x-show="$store.ui.palette" x-data="palette([
-    {label:'Today',href:'/'},{label:'Fields',href:'/farms/'},{label:'Add a farm or field',href:'/farms/onboarding/'},
+    {label:'Today',href:'/'},{label:'Guide: how to use this app',href:'/guide/'},{label:'Fields',href:'/farms/'},{label:'Add a farm or field',href:'/farms/onboarding/'},
     {label:'Insights',href:'/insights/'},{label:'Alerts',href:'/notifications/'},{label:'Alert settings',href:'/notifications/settings/'},
     {label:'Sent messages (demo log)',href:'/notifications/sent/'},{label:'Plans and billing',href:'/billing/'},{label:'Pilot results',href:'/pilot/'},
     {label:'Account',href:'/account/'},{label:'Design gallery',href:'/design/'}{% if request.user.is_partner %},{label:'Partner dashboard',href:'/partners/'}{% endif %}])"

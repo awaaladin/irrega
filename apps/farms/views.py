@@ -55,9 +55,20 @@ def _weather_strip(farm):
 
 
 def landing(request):
-    from .landing_content import GLOSSARY, SCREENS, TOC
+    from .landing_content import SCREENS
 
-    return render(request, "landing.html", {"toc": TOC, "screens": SCREENS, "glossary": GLOSSARY})
+    return render(request, "landing.html", {"screens": SCREENS})
+
+
+def guide(request):
+    """The full how-to. Inside the dashboard shell when signed in; the same page for visitors, in a plain shell."""
+    from . import landing_content as c
+
+    return render(request, "guide.html", {
+        "layout": "app.html" if request.user.is_authenticated else "public.html", "active": "Guide",
+        "toc": c.TOC_GUIDE, "screens": c.SCREENS, "glossary": c.GLOSSARY, "quickstart": c.QUICKSTART,
+        "daily": c.DAILY_ROUTINE, "situations": c.SITUATIONS, "actions": ["IRRIGATE_NOW", "IRRIGATE_LATER_TODAY", "SKIP_TODAY", "WATCH"],
+    })
 
 
 def home(request):

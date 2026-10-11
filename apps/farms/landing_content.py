@@ -251,3 +251,37 @@ GLOSSARY = [
     ("Confidence", "How sure we are. It falls when a soil reading or the forecast is missing or old, and we tell you which."),
     ("Override", "Doing it your own way. We record it and learn, but never change anything without asking you."),
 ]
+
+
+# ---- "How to use it": the practical half of the guide -------------------------------------------------------------
+
+QUICKSTART = [
+    ("Add your farm", "Open <strong>Fields</strong> and press <em>Add a farm</em>. Tap the map where your farm is (or press <em>Use my location</em>). This is how we get the weather for your exact spot.", "map-pin"),
+    ("Add a field", "Give it a name, pick the crop, say how big it is, the soil type, the planting date and how you water. You do not need to know the growth stage. We work it out.", "sprout"),
+    ("Take a soil reading", "Push a probe or your finger about 10 cm into the soil. On the field page, move the slider to what you find and press <em>Save reading</em>. This is the single most useful thing you can give us.", "thermo"),
+    ("Read today's decision", "Go to <strong>Today</strong>. Each field has one card: water now, water later, skip, or watch, with how much and when.", "today"),
+    ("Respond", "Press <strong>Accept advice</strong> if you agree. If you will do something different, press <strong>Override</strong> and tell us what. Both are saved.", "check"),
+]
+
+DAILY_ROUTINE = [
+    ("Morning, 2 minutes", "Open <strong>Today</strong>. Look at each card's decision and time window. Accept or override.", "sunset"),
+    ("When you water", "Use the amount shown. If you only have a few cans, ask <em>How much if I only have 5 cans?</em> on the field page.", "drop"),
+    ("Every day or two", "Add a fresh soil reading on each field. Confidence goes up and the advice sharpens.", "thermo"),
+    ("Once a week", "Open <strong>Insights</strong>. Check the crop-stress tiles for any field going amber, and see how much water you have saved.", "chart"),
+    ("After harvest", "On the field page, add the harvest in kilograms and tick the box if a dry spell hurt it. Next season starts smarter.", "leaf"),
+]
+
+SITUATIONS = [
+    ("The confidence says Low", "Something is missing or old. The card tells you what. Usually the fix is a fresh soil reading, or the forecast needs a few minutes to refresh. The advice is still our best estimate.", "alert"),
+    ("It says Watch and I expected to water", "Watch means more water will not fix the problem. The crop is losing greenness but the soil is already wet. Look for disease, pests, poor drainage or a nutrient problem, and add a soil reading.", "eye"),
+    ("It says Skip but the leaves look dry", "Trust your eyes. Press <strong>Override</strong>, choose <em>Water this field</em>, and pick the reason <em>Crop looks thirsty</em>. Also add a soil reading. It may be drier than we think.", "pencil"),
+    ("It wants a lot of water", "A single watering is capped at 30 mm because more mostly runs off. Give that amount now and check again tomorrow. We say so on the card.", "drop"),
+    ("Rain is forecast but I am not sure", "Open <strong>Why this?</strong>. We count only part of the forecast rain, and we show the chance as a number, not just a picture. <em>What if I wait a day?</em> tells you the cost of waiting.", "cloud-rain"),
+    ("I have no internet", "Pages you opened before are still on your phone, marked with when they were last updated. Soil readings and questions need a connection.", "wifi-off"),
+    ("Movement or animation bothers me", "Go to <strong>Account &rarr; Display</strong> and choose <em>Reduce motion</em>. Everything works the same.", "settings"),
+]
+
+TOC_GUIDE = [
+    ("start", "Your first 5 minutes"), ("daily", "A daily routine"), ("decisions", "The four decisions"), ("situations", "When something looks off"),
+    ("screens", "Every screen"),
+] + [(s["id"], s["title"]) for s in SCREENS] + [("words", "Words you will meet"), ("honest", "What we are honest about")]
