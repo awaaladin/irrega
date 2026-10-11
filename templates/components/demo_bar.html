@@ -1,0 +1,20 @@
+{% load ui %}
+{# Demo bar: live scenario switch for the walkthrough. Only shown for demo farms. #}
+{% if demo_farm %}
+<section class="card border-watch/30 p-3 sm:p-4" aria-label="Demo controls">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
+    <p class="flex items-center gap-2 text-sm font-semibold">{% include "components/demo_badge.html" with label="Demo controls" %}</p>
+    <form method="post" action="{% url 'demo:scenario' %}" class="inline-flex rounded-md border border-line bg-sunken p-0.5" role="group" aria-label="Weather scenario">
+      {% csrf_token %}
+      {% for key, label, ic in scenarios %}
+      <button type="submit" name="scenario" value="{{ key }}" x-press class="btn min-h-[40px] gap-1.5 px-3 text-sm {% if demo_farm.scenario == key %}bg-raised text-ink shadow-raised{% else %}text-mute{% endif %}" aria-pressed="{% if demo_farm.scenario == key %}true{% else %}false{% endif %}">
+        {% icon ic "h-4 w-4" %}{{ label }}
+      </button>
+      {% endfor %}
+    </form>
+    <form method="post" action="{% url 'demo:sensor' %}">{% csrf_token %}<button type="submit" class="btn btn-ghost min-h-[40px] text-sm">{% icon "thermo" "h-4 w-4" %}Simulate sensor reading</button></form>
+    <button type="button" class="btn btn-ghost min-h-[40px] text-sm" @click="$store.ui.tour = true">{% icon "play" "h-4 w-4" %}Judge walkthrough</button>
+    <form method="post" action="{% url 'demo:reset' %}" class="ml-auto" onsubmit="return confirm('Rebuild the demo farm from scratch? Your demo choices will be cleared.')">{% csrf_token %}<button type="submit" class="btn btn-quiet min-h-[40px] text-sm">Reset demo</button></form>
+  </div>
+</section>
+{% endif %}

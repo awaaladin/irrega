@@ -1,0 +1,87 @@
+{% extends "app.html" %}
+{% load ui humanize %}
+{% block title %}Today · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <p class="eyebrow">{{ farm.name }}</p>
+      <h1 class="mt-1 text-[1.9rem] leading-tight sm:text-4xl">
+        {% if attention %}{{ attention|length }} field{{ attention|length|pluralize }} need{{ attention|length|pluralize:"s," }} your eyes today{% else %}Good morning, {{ request.user.display_name }}{% endif %}
+      </h1>
+      <p class="mt-1.5 text-mute">One decision per field. You choose what happens.</p>
+    </div>
+    <form method="post" action="{% url 'notifications:digest' %}">{% csrf_token %}<button class="btn btn-ghost" type="submit">{% icon "bell" %}Send me the morning plan</button></form>
+  </header>
+
+  {% include "components/demo_bar.html" with scenarios=demo_scenarios %}
+
+  {% for s in learned %}
+  <div class="card flex flex-wrap items-center gap-3 border-laterite/40 p-4" role="note">
+    <span class="text-laterite">{% icon "sparkle" %}</span>
+    <p class="min-w-0 flex-1 text-[0.97rem]">{{ s.text }}</p>
+    <span class="text-sm text-mute">This is a suggestion. Nothing changes unless you say so.</span>
+  </div>
+  {% endfor %}
+
+  {% if show_checklist %}
+  <section class="card card-pad" aria-labelledby="check-h">
+    <div class="flex items-center gap-3">
+      <h2 id="check-h" class="text-lg">Get set up</h2>
+      <span class="num ml-auto text-sm text-mute">{{ steps_done }} of {{ steps|length }}</span>
+    </div>
+    <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-sunken"><div x-grow class="h-full rounded-full bg-water" style="width: {% widthratio steps_done steps|length 100 %}%"></div></div>
+    <ul class="mt-4 grid gap-1 sm:grid-cols-2">
+      {% for s in steps %}
+      <li>
+        <a href="{{ s.href }}" class="flex min-h-touch items-center gap-3 rounded-md px-2 hover:bg-sunken">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full border {% if s.done %}border-leaf bg-leaf text-onaccent{% else %}border-line{% endif %}">{% if s.done %}{% icon "check" "h-4 w-4" %}{% endif %}</span>
+          <span class="{% if s.done %}text-mute line-through{% endif %}">{{ s.label }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section aria-label="Today's decisions" class="grid gap-5 lg:grid-cols-1" x-stagger>
+    {% for c in cards %}
+    <div>{% include "components/recommendation_card.html" with open_why=False %}</div>
+    {% endfor %}
+  </section>
+
+  <div class="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+    {% if weather %}{% include "components/weather_strip.html" %}{% endif %}
+    <div class="space-y-5">
+      <div class="card card-pad">
+        <p class="eyebrow">Water saved this month (estimate)</p>
+        <p class="mt-1.5 font-display text-4xl leading-none"><span class="num" x-count="{{ water_saved }}">{{ water_saved }}</span><span class="ml-1 text-lg text-mute">litres</span></p>
+        <p class="mt-2 text-sm text-mute">{{ baseline_note }}</p>
+      </div>
+      <div class="card card-pad" aria-labelledby="stress-h">
+        <h2 id="stress-h" class="text-lg">Crop stress</h2>
+        <ul class="mt-3 space-y-3">
+          {% for c in cards %}
+          <li class="flex items-center justify-between gap-3">
+            <span class="min-w-0 truncate text-sm">{{ c.field.name }}</span>
+            {% include "components/ndvi_sparkline.html" with values=c.ndvi_values latest=c.p.ndvi.latest state=c.p.ndvi.state simulated=c.p.ndvi.simulated id=c.field.pk %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section class="card card-pad" aria-labelledby="fb-h">
+    <h2 id="fb-h" class="text-lg">How is the advice working for you?</h2>
+    <form method="post" action="{% url 'partners:feedback' %}" class="mt-3 flex flex-wrap items-center gap-2">
+      {% csrf_token %}
+      <div class="inline-flex gap-1" role="radiogroup" aria-label="Rating out of 5">
+        {% for n in "12345" %}<label class="chip min-w-touch cursor-pointer justify-center"><input class="sr-only" type="radio" name="rating" value="{{ n }}" required>{{ n }}</label>{% endfor %}
+      </div>
+      <input name="text" class="input flex-1 min-w-[200px]" placeholder="Anything we should fix or add?" maxlength="600">
+      <button class="btn btn-ghost" type="submit">Send</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

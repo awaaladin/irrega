@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Offline · Routine Irrigation Technology{% endblock %}
+{% block body %}
+<main id="main" class="flex min-h-dvh items-center justify-center px-4">
+  <div class="card max-w-md space-y-3 p-8 text-center">
+    <span class="mx-auto text-watch">{% icon "wifi-off" "h-10 w-10" %}</span>
+    <h1 class="text-2xl">You are offline</h1>
+    <p class="text-mute">We could not reach the internet. Pages you opened before are still saved on this phone, and your last advice is marked "Last updated". Try again when you have signal.</p>
+    <button class="btn btn-primary" onclick="location.reload()">Try again</button>
+  </div>
+</main>
+{% endblock %}

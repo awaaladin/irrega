@@ -1,0 +1,31 @@
+{% extends "app.html" %}
+{% load ui humanize %}
+{% block title %}Pilot results · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <header><h1 class="text-3xl">Your pilot results</h1><p class="mt-1 text-mute">A simple summary of how the advice has worked on your farm. Estimates are labelled as estimates.</p></header>
+  {% for r in rows %}
+  <section class="card card-pad">
+    <div class="flex flex-wrap items-center gap-2"><h2 class="text-xl">{{ r.farm.name }}</h2>{% if r.farm.is_demo %}{% include "components/demo_badge.html" %}{% endif %}</div>
+    <dl class="num mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div><dt class="eyebrow">Fields</dt><dd class="font-display text-3xl">{{ r.fields }}</dd></div>
+      <div><dt class="eyebrow">Decisions</dt><dd class="font-display text-3xl">{{ r.decisions }}</dd></div>
+      <div><dt class="eyebrow">Overrides</dt><dd class="font-display text-3xl">{{ r.override_rate }}%</dd></div>
+      <div><dt class="eyebrow">Water saved</dt><dd class="font-display text-3xl">{{ r.water_saved_l|intcomma }}<span class="ml-1 text-base text-mute">L</span></dd></div>
+    </dl>
+    <p class="mt-3 text-sm text-mute">Water saved is an estimate compared with watering every day at the crop's daily need.</p>
+  </section>
+  {% empty %}
+  {% include "components/empty_state.html" with title="No results yet" text="Add a farm and respond to a few recommendations. Results appear here." href="/farms/onboarding/" cta="Add a farm" %}
+  {% endfor %}
+  <section class="card card-pad">
+    <h2 class="text-lg">Tell us how it is going</h2>
+    <form method="post" action="{% url 'partners:feedback' %}" class="mt-3 space-y-3">
+      {% csrf_token %}
+      <div class="inline-flex gap-1" role="radiogroup" aria-label="Rating out of 5">{% for n in "12345" %}<label class="chip min-w-touch cursor-pointer justify-center"><input class="sr-only" type="radio" name="rating" value="{{ n }}" required>{{ n }}</label>{% endfor %}</div>
+      <textarea name="text" rows="3" maxlength="600" class="textarea" placeholder="What worked? What should we fix?"></textarea>
+      <button class="btn btn-primary" type="submit">Send feedback</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

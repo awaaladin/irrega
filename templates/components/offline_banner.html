@@ -1,0 +1,5 @@
+{% load ui %}
+<div x-cloak x-show="!$store.ui.online" role="status" class="flex items-center gap-2 border-b border-watch/40 bg-watch/10 px-4 py-2 text-sm text-ink md:px-8">
+  <span class="text-watch">{% icon "wifi-off" "h-5 w-5" %}</span>
+  <span><strong>You are offline.</strong> Showing your last saved advice. Readings and questions will work again when you are back online.</span>
+</div>

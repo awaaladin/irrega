@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Sign in · Routine Irrigation Technology{% endblock %}
+{% block body %}
+<main id="main" class="hero-surface flex min-h-dvh items-center justify-center px-4 py-10">
+  <div class="w-full max-w-md space-y-6" x-stagger>
+    <div class="flex flex-col items-center gap-3 text-center">
+      {% include "components/logo.html" with size="h-14 w-14" %}
+      <h1 class="text-[2rem] leading-tight">Routine Irrigation Technology</h1>
+      <p class="max-w-sm text-mute">Clear daily watering advice for your farm. You stay in control.</p>
+    </div>
+
+    <form method="post" class="card card-pad space-y-4" novalidate>
+      {% csrf_token %}
+      <div>
+        <label class="label" for="identifier">Email or phone number</label>
+        <input id="identifier" name="identifier" class="input" autocomplete="username" inputmode="email" required autofocus {% if error %}aria-invalid="true" aria-describedby="login-error"{% endif %}>
+      </div>
+      <div>
+        <label class="label" for="password">Password</label>
+        <input id="password" name="password" type="password" class="input" autocomplete="current-password" required {% if error %}aria-invalid="true"{% endif %}>
+      </div>
+      {% if error %}<p id="login-error" class="field-error" role="alert">{{ error }}</p>{% endif %}
+      <button type="submit" x-press class="btn btn-primary w-full">Sign in</button>
+      <p class="text-center text-sm text-mute">New here? <a class="font-semibold text-water hover:underline" href="{% url 'accounts:register' %}">Create an account</a></p>
+    </form>
+
+    {% if DEMO_MODE %}
+    <div class="card card-pad space-y-3 border-watch/30">
+      <p class="flex items-center gap-2 text-sm font-semibold">{% include "components/demo_badge.html" %} Try it with a sample farm</p>
+      <p class="text-sm text-mute">A Calabar South farm with three fields and 90 days of simulated history. No sign-up.</p>
+      <div class="flex flex-wrap gap-2">
+        <a class="btn btn-water flex-1" href="{% url 'demo:enter' %}">{% icon "play" %}Explore as a farmer</a>
+        <a class="btn btn-ghost flex-1" href="{% url 'demo:enter_as' 'partner' %}">{% icon "users" %}Partner view</a>
+      </div>
+    </div>
+    {% endif %}
+    <div class="flex justify-center">{% include "components/theme_toggle.html" %}</div>
+  </div>
+</main>
+{% endblock %}

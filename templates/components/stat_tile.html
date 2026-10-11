@@ -1,0 +1,8 @@
+{# StatTile: label, big tabular number, optional footnote. value may be numeric (counts up). #}
+<div class="card card-pad">
+  <p class="eyebrow">{{ label }}</p>
+  <p class="mt-1.5 font-display text-4xl leading-none">
+    <span class="num" {% if numeric %}x-count="{{ value }}" data-decimals="{{ decimals|default:0 }}"{% endif %}>{{ value }}</span>{% if unit %}<span class="ml-1 text-lg text-mute">{{ unit }}</span>{% endif %}
+  </p>
+  {% if note %}<p class="mt-2 text-sm text-mute">{{ note }}</p>{% endif %}
+</div>

@@ -1,0 +1,52 @@
+{% extends "app.html" %}
+{% load ui humanize %}
+{% block title %}Partner dashboard · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <header>
+    <p class="eyebrow">{{ org.name|default:"All organisations" }}</p>
+    <h1 class="mt-1 text-3xl">Partner dashboard</h1>
+    <p class="mt-1 text-mute">The farms you support: usage, pilot results, water saved and data quality.</p>
+  </header>
+
+  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4" x-stagger>
+    <div>{% include "components/stat_tile.html" with label="Farms" value=totals.farms numeric=True note=totals.fields|stringformat:"s"|add:" fields" %}</div>
+    <div>{% include "components/stat_tile.html" with label="Water saved (30 days)" value=totals.water_saved_l numeric=True unit="L" note="Estimate vs a fixed daily schedule" %}</div>
+    <div>{% include "components/stat_tile.html" with label="Override rate" value=totals.override_rate numeric=True unit="%" note="Farmers choosing their own way" %}</div>
+    <div>{% include "components/stat_tile.html" with label="Data-quality flags" value=totals.flags numeric=True note="Old readings or forecasts" %}</div>
+  </div>
+
+  {# PartnerTable #}
+  <section class="card" aria-labelledby="tbl-h">
+    <div class="flex items-center gap-2 px-5 pt-5"><h2 id="tbl-h" class="text-lg">Farms</h2>{% if rows.0.farm.is_demo %}{% include "components/demo_badge.html" %}{% endif %}</div>
+    <div class="mt-3 overflow-x-auto">
+      <table class="num w-full min-w-[720px] text-left text-sm">
+        <thead class="border-y border-line bg-sunken/60 text-mute">
+          <tr><th scope="col" class="px-5 py-2.5 font-medium">Farm</th><th scope="col" class="font-medium">Farmer</th><th scope="col" class="text-right font-medium">Fields</th><th scope="col" class="text-right font-medium">Decisions</th><th scope="col" class="text-right font-medium">Overrides</th><th scope="col" class="text-right font-medium">Water saved</th><th scope="col" class="px-5 font-medium">Data quality</th></tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr class="border-b border-line last:border-0">
+            <th scope="row" class="px-5 py-3 font-medium">{{ r.farm.name }}</th>
+            <td>{{ r.farm.owner.display_name }}</td>
+            <td class="text-right">{{ r.fields }}</td>
+            <td class="text-right">{{ r.decisions }}</td>
+            <td class="text-right">{{ r.override_rate }}%</td>
+            <td class="text-right">{{ r.water_saved_l|intcomma }} L</td>
+            <td class="px-5">{% if r.flags %}<span class="pill border border-watch/40 bg-watch/15 text-watch" title="{{ r.flags|join:'; ' }}">{% icon "alert" "h-3.5 w-3.5" %}{{ r.flags|length }} flag{{ r.flags|length|pluralize }}</span>{% else %}<span class="pill border border-leaf/40 bg-leaf/15 text-leaf">{% icon "check" "h-3.5 w-3.5" %}Good</span>{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="px-5 py-8 text-center text-mute">No farms are linked to your organisation yet. Share a pilot code so farmers join under it.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if feedback %}
+  <section class="card card-pad"><h2 class="text-lg">Pilot feedback</h2>
+    <ul class="mt-3 space-y-3">{% for f in feedback %}<li class="border-t border-line pt-3 first:border-0 first:pt-0"><p class="num text-sm text-mute">{{ f.rating }} / 5 &middot; {{ f.created|naturaltime }}</p><p>{{ f.text|default:"(no comment)" }}</p></li>{% endfor %}</ul>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

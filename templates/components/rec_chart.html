@@ -1,0 +1,14 @@
+{% load ui %}
+{# Compact per-field bar for Insights: where soil moisture sits against the water-now line #}
+{% with b=c.p.balance %}{% with m=b.sat|add:6 %}
+<div class="mt-3">
+  <div class="relative h-3 overflow-hidden rounded-full bg-sunken" role="img" aria-label="Soil moisture {{ b.theta }} percent. Water-now line {{ b.trigger_pct }} percent. Field capacity {{ b.fc }} percent. Waterlogged above {{ b.sat }} percent.">
+    <div class="absolute inset-y-0 left-0 bg-stress/30" style="width: {{ b.trigger_pct|scale:m }}%"></div>
+    <div class="absolute inset-y-0 bg-water/30" style="left: {{ b.trigger_pct|scale:m }}%; right: {{ b.sat|scale:m|rest }}%"></div>
+    <div class="absolute inset-y-0 right-0 bg-skip/30" style="left: {{ b.sat|scale:m }}%"></div>
+    <span class="absolute top-1/2 h-5 w-1.5 -translate-y-1/2 rounded-full bg-ink" style="left: {{ b.theta|scale:m }}%"></span>
+  </div>
+  <div class="num mt-2 flex flex-wrap justify-between gap-x-3 text-xs text-mute"><span>Water-now {{ b.trigger_pct }}%</span><span>Field capacity {{ b.fc }}%</span><span>Waterlogged {{ b.sat }}%</span></div>
+  <p class="mt-3 text-sm">Soil is at <strong class="num">{{ b.theta }}%</strong>. {{ c.p.what_if_text }}</p>
+</div>
+{% endwith %}{% endwith %}

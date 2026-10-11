@@ -1,0 +1,9 @@
+{% load ui %}
+{# LanguageToggle: English / Nigerian Pidgin for explanations. More languages = one more dict in engine/explain.py #}
+<form method="post" action="{% url 'accounts:language' %}" class="flex">
+  {% csrf_token %}
+  <div class="inline-flex rounded-md border border-line bg-sunken p-0.5" role="group" aria-label="Explanation language">
+    <button type="submit" name="lang" value="en" class="btn min-h-[36px] px-2.5 text-xs {% if lang == 'en' or not lang %}bg-raised text-ink shadow-raised{% else %}text-mute{% endif %}" aria-pressed="{% if lang == 'en' or not lang %}true{% else %}false{% endif %}">EN</button>
+    <button type="submit" name="lang" value="pcm" class="btn min-h-[36px] px-2.5 text-xs {% if lang == 'pcm' %}bg-raised text-ink shadow-raised{% else %}text-mute{% endif %}" aria-pressed="{% if lang == 'pcm' %}true{% else %}false{% endif %}" title="Nigerian Pidgin">Pidgin</button>
+  </div>
+</form>

@@ -1,0 +1,14 @@
+{% load ui %}
+{# SignalBreakdown: contribution bars, largest first, growing in sequence #}
+<div>
+  <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+    <h4 class="eyebrow">What the advice is based on</h4>
+    <p class="flex items-center gap-3 text-xs text-mute">
+      <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-water"></span>pushes to water</span>
+      <span class="inline-flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-skip"></span>pushes to skip</span>
+    </p>
+  </div>
+  <ul class="space-y-4">
+    {% for s in signals %}{% include "components/signal_bar.html" with delay=forloop.counter0|mul:0.08 %}{% endfor %}
+  </ul>
+</div>

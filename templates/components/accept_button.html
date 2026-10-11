@@ -1,0 +1,13 @@
+{% load ui %}
+{# AcceptButton: idle -> loading -> done (fill, the check draws itself, brief settle). Needs a parent x-data="decision(...)". #}
+<button type="button" x-press @click="accept()" :disabled="state === 'loading' || state === 'done'"
+        class="btn btn-primary col-span-2 w-full sm:col-span-1 sm:w-auto sm:min-w-[160px]" :class="state === 'done' && kind === 'accept' ? '!bg-leaf' : ''" :data-loading="state === 'loading'">
+  <template x-if="state === 'idle'"><span class="inline-flex items-center gap-2">{% icon "check" %}{{ label|default:"Accept advice" }}</span></template>
+  <template x-if="state === 'loading'"><span class="inline-flex items-center gap-2"><svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".25"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>Saving</span></template>
+  <template x-if="state === 'done'">
+    <span class="inline-flex items-center gap-2" x-rise>
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path x-draw data-draw-id="" d="M4.500 12.500l5 5 10-11"/></svg>
+      <span x-text="kind === 'accept' ? 'Accepted' : kind === 'override' ? 'Your choice saved' : 'Snoozed'"></span>
+    </span>
+  </template>
+</button>

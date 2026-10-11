@@ -1,0 +1,7 @@
+{% load ui %}
+{# TrialBanner #}
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-line bg-sunken/70 px-4 py-2 text-sm md:px-8">
+  <span class="text-laterite">{% icon "clock" "h-4 w-4" %}</span>
+  <span><strong class="num">{{ trial_days }}</strong> day{{ trial_days|pluralize }} left in your free pilot trial.</span>
+  <a href="{% url 'billing:plans' %}" class="ml-auto font-semibold text-water underline-offset-4 hover:underline">See plans</a>
+</div>

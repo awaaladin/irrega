@@ -1,0 +1,14 @@
+{% load ui %}
+{# ToastHost: polite live region; success, error, info tones; each has icon + text, never colour alone #}
+<div class="pointer-events-none fixed inset-x-0 bottom-24 z-toast flex flex-col items-center gap-2 px-4 md:bottom-6" role="status" aria-live="polite">
+  <template x-for="t in $store.ui.toasts" :key="t.id">
+    <div x-rise class="pointer-events-auto flex max-w-md items-center gap-3 rounded-md border bg-raised px-4 py-3 text-sm shadow-float"
+         :class="t.tone === 'error' ? 'border-stress/60' : t.tone === 'success' ? 'border-water/60' : 'border-line'">
+      <span :class="t.tone === 'error' ? 'text-stress' : t.tone === 'success' ? 'text-water' : 'text-mute'">
+        <svg class="h-5 w-5 fill-none stroke-current" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use :href="t.tone === 'error' ? '#i-alert' : t.tone === 'success' ? '#i-check' : '#i-info'"/></svg>
+      </span>
+      <span x-text="t.text"></span>
+      <button type="button" class="btn btn-quiet -mr-2 min-w-touch px-2" @click="$store.ui.dismiss(t.id)" aria-label="Dismiss">{% icon "x" "h-4 w-4" %}</button>
+    </div>
+  </template>
+</div>

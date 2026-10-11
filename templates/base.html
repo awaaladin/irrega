@@ -1,0 +1,34 @@
+{% load static ui %}<!doctype html>
+<html lang="{{ request.user.language|default:'en' }}" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Routine Irrigation Technology{% endblock %}</title>
+  <meta name="description" content="Clear daily irrigation advice for small farms in Cross River State. You stay in control.">
+  <meta name="theme-color" content="#0B1A19">
+  <link rel="manifest" href="{% url 'core:manifest' %}">
+  <link rel="icon" href="{% static 'img/icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'img/icon-192.png' %}">
+  <link rel="preload" href="{% static 'vendor/fonts/inter-tight.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block head %}{% endblock %}
+  <script>
+    /* Apply saved theme before first paint to avoid a flash. */
+    try { document.documentElement.dataset.theme = localStorage.getItem("rit-theme") || "dark"; } catch (e) {}
+    /* Motion preference: "system" (follow the device), "reduce" or "full". */
+    try { document.documentElement.dataset.motion = localStorage.getItem("rit-motion") || "system"; } catch (e) {}
+  </script>
+  <script defer src="{% static 'vendor/motion.js' %}"></script>
+  <script defer src="{% static 'js/app.js' %}"></script>
+  <script defer src="{% static 'vendor/alpine.min.js' %}"></script>
+</head>
+<body x-data class="{% block body_class %}{% endblock %}">
+  {% include "components/icons.html" %}
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-toast focus:rounded-md focus:bg-raised focus:px-3 focus:py-2">Skip to content</a>
+  {% block body %}{% endblock %}
+
+  {% include "components/toast_host.html" %}
+  <div class="sr-live" aria-live="polite" id="live-region"></div>
+  <noscript><p class="p-4 text-center text-mute">This app works best with JavaScript on. Your advice is still shown below.</p></noscript>
+</body>
+</html>

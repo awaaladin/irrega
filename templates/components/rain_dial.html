@@ -1,0 +1,12 @@
+{# RainProbabilityDial: fills like water. prob = 0-100. size in px. The number is always printed, so the fill is never the only signal. #}
+{% load ui %}
+<div class="relative" style="width: {{ size|default:56 }}px; height: {{ size|default:56 }}px" role="img" aria-label="{{ prob|floatformat:0 }} percent chance of rain">
+  <svg viewBox="0 0 40 40" class="h-full w-full" aria-hidden="true">
+    <defs><clipPath id="dial-{{ uid }}"><circle cx="20" cy="20" r="17.5"/></clipPath></defs>
+    <circle cx="20" cy="20" r="18" fill="rgb(var(--bg-sunken))" stroke="rgb(var(--border-subtle))" stroke-width="1.5"/>
+    <g clip-path="url(#dial-{{ uid }})">
+      <rect x="0" y="0" width="40" height="40" fill="rgb(var(--signal-skip))" fill-opacity="{% if prob >= 60 %}.55{% else %}.35{% endif %}" style="transform-box: fill-box" x-fill="{{ prob|floatformat:0 }}"/>
+    </g>
+  </svg>
+  <span class="num absolute inset-0 flex items-center justify-center text-[13px] font-semibold">{{ prob|floatformat:0 }}%</span>
+</div>

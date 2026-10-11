@@ -1,0 +1,37 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}Account · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-2xl space-y-6">
+  <header><h1 class="text-3xl">Account</h1><p class="mt-1 text-mute">{{ request.user.display_name }} &middot; <span class="capitalize">{{ request.user.role }}</span></p></header>
+
+  <nav class="card divide-y divide-line" aria-label="Account sections">
+    {% for href, label, ic in links %}
+    <a href="{{ href }}" class="flex min-h-[56px] items-center gap-3 px-4 transition-colors hover:bg-sunken"><span class="text-mute">{% icon ic %}</span><span class="font-medium">{{ label }}</span><span class="ml-auto text-mute">{% icon "chevron-right" %}</span></a>
+    {% endfor %}
+  </nav>
+
+  <section class="card card-pad space-y-4" aria-labelledby="look-h">
+    <h2 id="look-h" class="text-lg">Display</h2>
+    {% include "components/motion_setting.html" with options=motion_options %}
+  </section>
+
+  <section class="card card-pad space-y-4" aria-labelledby="keys-h">
+    <div>
+      <h2 id="keys-h" class="text-lg">Sensor API keys</h2>
+      <p class="mt-1 text-sm text-mute">A future soil sensor or gateway can send readings with <code class="num">POST /api/readings/</code> and <code class="num">Authorization: Bearer &lt;key&gt;</code>. Body: <code class="num">{"field": 1, "value": 24.5}</code>.</p>
+    </div>
+    <ul class="space-y-2">
+      {% for k in keys %}
+      <li class="well flex items-center gap-3 p-3">
+        <div class="min-w-0 flex-1"><p class="text-sm font-medium">{{ k.label }}</p><p class="num truncate font-mono text-xs text-mute">{{ k.key }}</p></div>
+        <form method="post" action="{% url 'core:key_delete' k.pk %}">{% csrf_token %}<button class="btn btn-danger min-h-[40px] text-sm" type="submit">Delete</button></form>
+      </li>
+      {% empty %}<li class="text-sm text-mute">No keys yet.</li>{% endfor %}
+    </ul>
+    <form method="post" action="{% url 'core:key_create' %}" class="flex gap-2">{% csrf_token %}<input name="label" class="input" placeholder="Name, e.g. Gateway at the farm gate" maxlength="60"><button class="btn btn-ghost" type="submit">Create key</button></form>
+  </section>
+
+  <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn-ghost w-full" type="submit">{% icon "logout" %}Sign out</button></form>
+</div>
+{% endblock %}

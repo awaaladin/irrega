@@ -1,0 +1,38 @@
+{% load ui %}
+{# AskPanel: grounded Q&A with streaming. States: empty, streaming, error, offline. #}
+<section id="ask" class="card flex flex-col" aria-labelledby="ask-h"
+         x-data="ask({ url: '{% url 'assistant:ask' %}', field: {{ field.pk }}, history: {{ chat }} })">
+  <header class="flex items-center gap-2 border-b border-line px-4 py-3">
+    <span class="text-water">{% icon "message" %}</span>
+    <h2 id="ask-h" class="text-lg">Ask about {{ field.name }}</h2>
+    <span class="pill ml-auto border border-line bg-sunken text-mute" title="Answers use only this field's readings, forecast and crop stage.">{% icon "shield" "h-3.5 w-3.5" %}Grounded in your data</span>
+  </header>
+
+  <div x-ref="log" class="max-h-[420px] min-h-[140px] space-y-3 overflow-y-auto px-4 py-4" aria-live="polite">
+    <p x-show="messages.length === 0" class="text-sm text-mute">Ask in your own words. I answer only from this field's soil reading, forecast and crop stage, and I will say when I do not know.</p>
+    <template x-for="(m, i) in messages" :key="i">
+      <div class="flex" :class="m.role === 'user' ? 'justify-end' : ''">
+        <p class="max-w-[88%] whitespace-pre-wrap rounded-lg px-3.5 py-2.5 text-[0.97rem] leading-relaxed"
+           :class="m.role === 'user' ? 'bg-water/15 text-ink' : 'border border-line bg-sunken'" x-text="m.text || '…'"></p>
+      </div>
+    </template>
+    <div x-show="busy" x-cloak class="flex items-center gap-2 text-sm text-mute" aria-label="Thinking">
+      <span class="breathe-dot h-2 w-2 rounded-full bg-water"></span>Looking at your field…
+    </div>
+  </div>
+
+  <div class="space-y-3 border-t border-line p-4">
+    <p x-show="error" x-cloak x-text="error" role="alert" class="flex items-center gap-2 text-sm text-stress"></p>
+    <p x-show="!$store.ui.online" x-cloak class="text-sm text-watch">You are offline. Questions need a connection.</p>
+    <ul class="flex gap-2 overflow-x-auto pb-1" aria-label="Suggested questions">
+      {% for q in suggested %}
+      <li><button type="button" class="chip whitespace-nowrap" data-q="{{ q }}" @click="send($el.dataset.q)" :disabled="busy">{{ q }}</button></li>
+      {% endfor %}
+    </ul>
+    <form class="flex gap-2" @submit.prevent="send()">
+      <label class="sr-only" for="ask-input">Your question</label>
+      <input id="ask-input" x-model="input" maxlength="500" class="input" placeholder="e.g. Should I water before the rain?" autocomplete="off" :disabled="busy">
+      <button type="submit" x-press class="btn btn-water min-w-touch px-3" :disabled="busy || !input.trim()" aria-label="Send question">{% icon "send" %}</button>
+    </form>
+  </div>
+</section>

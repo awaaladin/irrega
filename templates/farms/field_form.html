@@ -1,0 +1,61 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}{{ title }} · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-2xl space-y-6">
+  <header>
+    {% if not field %}<p class="eyebrow">Step 2 of 2</p>{% endif %}
+    <h1 class="mt-1 text-3xl">{{ title }}</h1>
+    <p class="mt-1.5 text-mute">{{ farm.name }}</p>
+  </header>
+  <form method="post" class="space-y-6" novalidate>
+    {% csrf_token %}
+    <div class="card card-pad space-y-4">
+      <div>
+        <label class="label" for="{{ form.name.id_for_label }}">Field name</label>{{ form.name }}
+        {% for e in form.name.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+      </div>
+      {# CropPicker #}
+      <fieldset x-data="{ crop: '{{ form.crop.value|default:'' }}' }">
+        <legend class="label">What are you growing?</legend>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {% for radio in form.crop %}
+          <label class="relative flex min-h-[64px] cursor-pointer items-center gap-3 rounded-md border border-line bg-sunken px-3 transition-colors hover:border-water/50 has-[:checked]:border-water has-[:checked]:bg-water/10 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-water">
+            <span class="sr-only">{{ radio.tag }}</span>
+            <span class="text-leaf">{% crop_icon radio.data.value.instance "h-6 w-6" %}</span>
+            <span class="text-sm font-medium">{{ radio.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% for e in form.crop.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+      </fieldset>
+    </div>
+
+    <div class="card card-pad grid gap-4 sm:grid-cols-2">
+      <div><label class="label" for="{{ form.area_ha.id_for_label }}">{{ form.area_ha.label }}</label>{{ form.area_ha }}<p class="field-hint">{{ form.area_ha.help_text }}</p>{% for e in form.area_ha.errors %}<p class="field-error">{{ e }}</p>{% endfor %}</div>
+      <div><label class="label" for="{{ form.planting_date.id_for_label }}">Planting date</label>{{ form.planting_date }}{% for e in form.planting_date.errors %}<p class="field-error">{{ e }}</p>{% endfor %}</div>
+      <div><label class="label" for="{{ form.soil.id_for_label }}">Soil type</label>{{ form.soil }}</div>
+      <div><label class="label" for="{{ form.method.id_for_label }}">How do you water?</label>{{ form.method }}</div>
+    </div>
+
+    {% if not field %}
+    <div class="card card-pad space-y-3">
+      <h2 class="text-lg">Pin this field <span class="text-sm font-normal text-mute">(optional)</span></h2>
+      {% include "components/map_picker.html" with lat_input="id_flat" lon_input="id_flon" lat_value=farm.latitude lon_value=farm.longitude %}
+      <input type="hidden" name="latitude" id="id_flat"><input type="hidden" name="longitude" id="id_flon">
+    </div>
+    {% endif %}
+
+    <div class="flex gap-2">
+      <a href="{% if field %}{% url 'farms:field_detail' field.pk %}{% else %}{% url 'farms:list' %}{% endif %}" class="btn btn-ghost">Cancel</a>
+      <button class="btn btn-primary flex-1" type="submit" x-press>Save field</button>
+    </div>
+  </form>
+
+  {% if field %}
+  <form method="post" action="{% url 'farms:field_delete' field.pk %}" onsubmit="return confirm('Remove this field and its history?')" class="text-center">
+    {% csrf_token %}<button class="btn btn-danger" type="submit">Remove this field</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

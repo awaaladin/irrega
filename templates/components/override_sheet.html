@@ -1,0 +1,67 @@
+{% load ui %}{% override_reasons as reasons %}
+{# OverrideSheet: rises from the tapped button; drag the handle down to dismiss (velocity aware). Must sit inside x-data="decision" and x-data="sheet". #}
+<template x-teleport="body">
+  <div x-show="open" x-cloak class="fixed inset-0 z-sheet flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-labelledby="ov-title-{{ rec.pk }}" @keydown.tab="trap($event)">
+    <div class="absolute inset-0 bg-base/70 backdrop-blur-sm" @click="close()" x-show="open" x-transition.opacity></div>
+    <div x-ref="panel" tabindex="-1" class="relative max-h-[92dvh] w-full overflow-y-auto rounded-t-xl border border-line bg-raised pb-[env(safe-area-inset-bottom)] shadow-sheet outline-none md:max-w-md md:rounded-xl">
+      <div class="flex touch-none justify-center pt-2 md:hidden" @pointerdown="dragStart($event)" @pointermove="dragMove($event)" @pointerup="dragEnd($event)" @pointercancel="dragEnd($event)">
+        <span class="h-1.5 w-12 rounded-full bg-line"></span>
+      </div>
+      <div class="space-y-5 p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 id="ov-title-{{ rec.pk }}" class="text-xl">Do it your way</h2>
+            <p class="mt-1 text-sm text-mute">You know this land. We will keep a note of what you chose, and why.</p>
+          </div>
+          <button type="button" class="btn btn-quiet min-w-touch px-2" @click="close()" aria-label="Close">{% icon "x" %}</button>
+        </div>
+
+        <fieldset>
+          <legend class="label">What will you do?</legend>
+          <div class="grid gap-2">
+            <label class="chip !min-h-touch cursor-pointer justify-start !rounded-md px-3" :aria-pressed="override.action === 'IRRIGATE'" :aria-selected="override.action === 'IRRIGATE'">
+              <input type="radio" class="sr-only" value="IRRIGATE" x-model="override.action" data-autofocus>{% icon "drop" %}Water this field
+            </label>
+            <label class="chip !min-h-touch cursor-pointer justify-start !rounded-md px-3" :aria-pressed="override.action === 'SKIP'" :aria-selected="override.action === 'SKIP'">
+              <input type="radio" class="sr-only" value="SKIP" x-model="override.action">{% icon "cloud-rain" %}Skip today
+            </label>
+            <label class="chip !min-h-touch cursor-pointer justify-start !rounded-md px-3" :aria-pressed="override.action === 'LATER'" :aria-selected="override.action === 'LATER'">
+              <input type="radio" class="sr-only" value="LATER" x-model="override.action">{% icon "sunset" %}Water at a different time
+            </label>
+          </div>
+        </fieldset>
+
+        <div x-show="override.action === 'IRRIGATE'" x-cloak class="well p-3">
+          <label class="label" for="litres-{{ rec.pk }}">How many litres?</label>
+          <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-ghost min-w-touch px-0" @click="bump(-step)" aria-label="Less water">{% icon "minus" %}</button>
+            <input id="litres-{{ rec.pk }}" type="number" inputmode="numeric" min="1" class="input num text-center text-lg" x-model.number="override.litres">
+            <button type="button" class="btn btn-ghost min-w-touch px-0" @click="bump(step)" aria-label="More water">{% icon "plus" %}</button>
+          </div>
+          <p class="field-hint num">About <span x-text="Math.max(0, Math.round((override.litres || 0) / 15))"></span> watering cans of 15 litres. We suggested {{ p.volume_l|num }} litres.</p>
+        </div>
+
+        <fieldset>
+          <legend class="label">Why? <span class="font-normal text-mute">(optional)</span></legend>
+          <div class="flex flex-wrap gap-2">
+            {% for key, text in reasons %}
+            <button type="button" class="chip" :aria-pressed="override.reason === '{{ key }}'" @click="override.reason = override.reason === '{{ key }}' ? '' : '{{ key }}'">{{ text }}</button>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <div>
+          <label class="label" for="note-{{ rec.pk }}">Note <span class="font-normal text-mute">(optional)</span></label>
+          <textarea id="note-{{ rec.pk }}" rows="2" maxlength="300" class="textarea" x-model="override.note" placeholder="Anything we should know?"></textarea>
+        </div>
+
+        <p x-show="error" x-cloak class="field-error" x-text="error" role="alert"></p>
+
+        <div class="flex gap-2">
+          <button type="button" class="btn btn-ghost flex-1" @click="close()">Cancel</button>
+          <button type="button" x-press class="btn btn-primary flex-1" :data-loading="state === 'loading'" @click="saveOverride()">Save my choice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

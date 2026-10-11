@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Design gallery · Routine Irrigation Technology{% endblock %}
+{% block body %}
+<div class="mx-auto max-w-5xl space-y-10 px-4 py-8 md:px-8" x-data="{ sheetOpen: false, loading: false }">
+  <header class="flex flex-wrap items-center gap-3">
+    <a href="/" class="btn btn-quiet -ml-3">{% icon "chevron-right" "h-5 w-5 rotate-180" %}App</a>
+    <h1 class="text-3xl">Design gallery</h1>
+    <div class="ml-auto flex items-center gap-2">{% include "components/theme_toggle.html" %}</div>
+  </header>
+  <p class="max-w-prose text-mute">Every component with its states. Tab through to see the focus ring; press and hold buttons to feel the compress and spring release. Switch theme to check both palettes. Turn on reduced motion in your system settings to check the fallback.</p>
+
+  <section aria-labelledby="g-tokens" class="space-y-3">
+    <h2 id="g-tokens" class="text-xl">Tokens</h2>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+      {% for name, cls in swatches %}
+      <div class="card overflow-hidden"><div class="h-14 {{ cls }}"></div><p class="num px-3 py-2 text-xs">{{ name }}</p></div>
+      {% endfor %}
+    </div>
+    <div class="card card-pad space-y-1">
+      <p class="font-display text-4xl">12.5 <span class="text-lg text-mute">mm</span> <span class="text-base text-mute">Fraunces for key numbers and headings</span></p>
+      <p class="text-lg">Inter Tight for interface text, tables and forms.</p>
+      <p class="num font-mono text-sm text-mute">JetBrains Mono, tabular: 0123456789 &middot; 24.5% &middot; 15,333 L</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-actions" class="space-y-3">
+    <h2 id="g-actions" class="text-xl">ActionBadge and ConfidenceMeter</h2>
+    <div class="card card-pad space-y-4">
+      <div class="flex flex-wrap gap-2">
+        {% for a in actions %}{% include "components/action_badge.html" with action=a big=True %}{% endfor %}
+      </div>
+      <div class="flex flex-wrap gap-6">{% include "components/confidence_meter.html" with level="High" %}{% include "components/confidence_meter.html" with level="Medium" %}{% include "components/confidence_meter.html" with level="Low" %}</div>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-buttons" class="space-y-3">
+    <h2 id="g-buttons" class="text-xl">Buttons</h2>
+    <div class="card card-pad grid gap-4 sm:grid-cols-2">
+      <div class="flex flex-wrap gap-2">
+        <button class="btn btn-primary" x-press>Default</button>
+        <button class="btn btn-primary" disabled>Disabled</button>
+        <button class="btn btn-primary" data-loading="true">Loading</button>
+        <button class="btn btn-water" x-press>Water</button>
+        <button class="btn btn-ghost" x-press>Ghost</button>
+        <button class="btn btn-quiet" x-press>Quiet</button>
+        <button class="btn btn-danger" x-press>Danger</button>
+      </div>
+      <div x-data="decision({ url: '#', rec: 0, decided: false, kind: '', litres: 0 })" class="flex flex-wrap items-center gap-3">
+        <p class="text-sm text-mute">AcceptButton states:</p>
+        <template x-for="s in ['idle','loading','done']"><button type="button" class="btn btn-primary" @click="state = s; kind = 'accept'" x-text="'Set ' + s"></button></template>
+        {% include "components/accept_button.html" %}
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-forms" class="space-y-3">
+    <h2 id="g-forms" class="text-xl">Form controls</h2>
+    <div class="card card-pad grid gap-4 sm:grid-cols-2">
+      <div><label class="label">Default</label><input class="input" placeholder="Farm name"></div>
+      <div><label class="label">Error</label><input class="input" aria-invalid="true" value="-5"><p class="field-error">Enter a size between 0.001 and 1000 hectares.</p></div>
+      <div><label class="label">Disabled</label><input class="input" disabled value="Calabar South"></div>
+      <div><label class="label">Chips (selected / default)</label><div class="flex flex-wrap gap-2"><button class="chip" aria-pressed="true">Already watered</button><button class="chip" aria-pressed="false">Rain started</button></div></div>
+      <div class="sm:col-span-2">
+        <label class="label">Segmented control and stepper</label>
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="inline-flex rounded-md border border-line bg-sunken p-0.5"><button class="btn min-h-[40px] bg-raised text-sm shadow-raised">Litres</button><button class="btn min-h-[40px] text-sm text-mute">Cans</button><button class="btn min-h-[40px] text-sm text-mute">mm</button></div>
+          <div class="flex items-center gap-2" x-data="{ n: 120 }"><button class="btn btn-ghost min-w-touch px-0" @click="n = Math.max(0, n - 10)" aria-label="Less">{% icon "minus" %}</button><span class="num w-16 text-center text-xl" x-text="n"></span><button class="btn btn-ghost min-w-touch px-0" @click="n += 10" aria-label="More">{% icon "plus" %}</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-data" class="space-y-3">
+    <h2 id="g-data" class="text-xl">Data</h2>
+    <div class="card card-pad space-y-5">
+      <div class="flex flex-wrap items-end gap-6">
+        {% for p in dials %}{% include "components/rain_dial.html" with prob=p uid=p size=64 %}{% endfor %}
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {% include "components/data_freshness.html" with time=now label="Updated" %}
+        {% include "components/data_freshness.html" with time=old stale=True label="Forecast" %}
+        {% include "components/demo_badge.html" %}
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <ul class="space-y-4">
+          {% for s in signals %}{% include "components/signal_bar.html" with delay=forloop.counter0|mul:0.1 %}{% endfor %}
+        </ul>
+        <div class="grid grid-cols-2 gap-3">
+          {% include "components/stat_tile.html" with label="Water saved" value=1840 numeric=True unit="L" note="Estimate" %}
+          {% include "components/stat_tile.html" with label="Override rate" value=12 numeric=True unit="%" %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-states" class="space-y-3">
+    <h2 id="g-states" class="text-xl">Loading, empty, error, offline</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="card card-pad space-y-3" aria-busy="true" aria-label="Loading">
+        <div class="skeleton h-5 w-1/3"></div><div class="skeleton h-9 w-2/3"></div><div class="grid grid-cols-2 gap-3"><div class="skeleton h-16"></div><div class="skeleton h-16"></div></div><div class="skeleton h-11"></div>
+      </div>
+      {% include "components/empty_state.html" with title="No fields yet" text="Add your first field and we will give you advice today." href="/farms/onboarding/" cta="Add a field" %}
+      <div class="card flex items-start gap-3 border-stress/40 p-4" role="alert"><span class="text-stress">{% icon "alert" %}</span><div><p class="font-semibold">We could not load the forecast</p><p class="text-sm text-mute">Showing your last saved advice. We will try again in a few minutes.</p><button class="btn btn-ghost mt-3 min-h-[40px] text-sm">Try again</button></div></div>
+      <div class="card flex items-center gap-3 border-watch/40 p-4">{% icon "wifi-off" %}<p class="text-sm"><strong>You are offline.</strong> Last updated 2 hours ago.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-overlay" class="space-y-3">
+    <h2 id="g-overlay" class="text-xl">Toasts and sheet</h2>
+    <div class="card card-pad flex flex-wrap gap-2">
+      <button class="btn btn-ghost" @click="$store.ui.toast('Soil reading saved.', 'success')">Success toast</button>
+      <button class="btn btn-ghost" @click="$store.ui.toast('We could not save that. Check your connection.', 'error')">Error toast</button>
+      <button class="btn btn-ghost" @click="$store.ui.toast('Forecast refreshed.')">Info toast</button>
+      <button class="btn btn-ghost" @click="$store.ui.palette = true">Command palette</button>
+      <button class="btn btn-ghost" @click="$store.ui.tour = true">Walkthrough</button>
+    </div>
+  </section>
+
+  <section aria-labelledby="g-lang" class="space-y-3">
+    <h2 id="g-lang" class="text-xl">Toggles</h2>
+    <div class="card card-pad space-y-5"><div class="flex flex-wrap items-center gap-6">{% include "components/theme_toggle.html" %}</div>{% include "components/motion_setting.html" with options=motion_options %}</div>
+  </section>
+</div>
+
+{% include "components/command_palette.html" %}
+{% endblock %}

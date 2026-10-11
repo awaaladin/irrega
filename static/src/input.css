@@ -1,0 +1,149 @@
+@import "./tokens.css";
+
+@font-face { font-family: "Fraunces Variable"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/static/vendor/fonts/fraunces.woff2") format("woff2"); }
+@font-face { font-family: "Fraunces Variable"; font-style: italic; font-weight: 100 900; font-display: swap; src: url("/static/vendor/fonts/fraunces-italic.woff2") format("woff2"); }
+@font-face { font-family: "Inter Tight Variable"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/static/vendor/fonts/inter-tight.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono Variable"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("/static/vendor/fonts/jetbrains-mono.woff2") format("woff2"); }
+
+/* Stagger targets start hidden only when motion is available, so content never gets stuck invisible. */
+.js:not(.no-motion) [x-stagger] > * { opacity: 0; }
+.js:not(.no-motion) [x-rise] { opacity: 0; }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-base text-ink font-sans antialiased;
+    font-feature-settings: "tnum" 1, "cv11" 1;
+    min-height: 100dvh;
+  }
+  h1, h2, h3 { @apply font-display; letter-spacing: -0.01em; }
+  [x-cloak] { display: none !important; }
+  ::selection { background: rgb(var(--accent-water) / 0.3); }
+  /* Clear, on-brand focus ring for every interactive element */
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-water));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  .num, .tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+}
+
+@layer components {
+  /* ---------- Buttons ---------- */
+  .btn {
+    @apply relative inline-flex min-h-touch select-none items-center justify-center gap-2 overflow-hidden rounded-md px-4 text-sm font-semibold;
+    transition: background-color var(--dur-fast) linear, color var(--dur-fast) linear, border-color var(--dur-fast) linear, opacity var(--dur-fast) linear;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:disabled, .btn[aria-disabled="true"] { @apply cursor-not-allowed opacity-45; }
+  .btn-primary { @apply bg-laterite text-onaccent shadow-raised; }
+  .btn-primary:hover:not(:disabled) { background-color: rgb(var(--accent-laterite) / 0.92); }
+  .btn-water { @apply bg-water text-onaccent shadow-raised; }
+  .btn-ghost { @apply border border-line bg-transparent text-ink; }
+  .btn-ghost:hover:not(:disabled) { @apply bg-sunken; }
+  .btn-quiet { @apply bg-transparent text-mute; }
+  .btn-quiet:hover:not(:disabled) { @apply text-ink; }
+  .btn-danger { @apply border border-stress/50 bg-transparent text-stress; }
+  /* hover highlight sweep */
+  .btn::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.14) 50%, transparent 65%);
+    transform: translateX(-120%);
+  }
+  .btn:hover:not(:disabled)::after { transform: translateX(120%); transition: transform 600ms var(--ease-out); }
+  .btn[data-loading="true"] { @apply pointer-events-none opacity-80; }
+
+  /* ---------- Surfaces ---------- */
+  .card { @apply rounded-lg border border-line bg-raised shadow-raised; }
+  .card-pad { @apply p-4 sm:p-5; }
+  .well { @apply rounded-md border border-line bg-sunken; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.12em] text-mute; }
+  .hairline { @apply border-t border-line; }
+
+  /* ---------- Form controls ---------- */
+  .input, .select, .textarea {
+    @apply min-h-touch w-full rounded-md border border-line bg-sunken px-3 text-ink placeholder:text-mute/70;
+    transition: border-color var(--dur-fast) linear, box-shadow var(--dur-fast) linear;
+  }
+  .textarea { @apply py-2; }
+  .input:hover, .select:hover, .textarea:hover { border-color: rgb(var(--text-secondary) / 0.6); }
+  .input:focus, .select:focus, .textarea:focus {
+    outline: none; border-color: rgb(var(--accent-water)); box-shadow: 0 0 0 3px rgb(var(--accent-water) / 0.25);
+  }
+  .input[aria-invalid="true"] { border-color: rgb(var(--signal-stress)); }
+  .input:disabled { @apply cursor-not-allowed opacity-50; }
+  .field-error { @apply mt-1 text-sm text-stress; }
+  .field-hint { @apply mt-1 text-sm text-mute; }
+  .label { @apply mb-1.5 block text-sm font-medium text-ink; }
+
+  /* ---------- Chips and pills ---------- */
+  .chip {
+    @apply inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-line bg-raised px-3 text-sm text-ink;
+    transition: background-color var(--dur-fast) linear, border-color var(--dur-fast) linear;
+  }
+  .chip:hover { @apply bg-sunken; }
+  .chip[aria-pressed="true"], .chip[aria-selected="true"] { border-color: rgb(var(--accent-water)); background: rgb(var(--accent-water) / 0.14); }
+  .pill { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold; }
+
+  /* ---------- Skeleton ---------- */
+  .skeleton { @apply relative overflow-hidden rounded-md bg-sunken; }
+  .skeleton::after {
+    content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(var(--text-primary) / 0.06), transparent);
+    animation: shimmer 2.4s ease-in-out infinite;
+  }
+
+  /* ---------- Hero surface with very slow gradient drift ---------- */
+  .hero-surface { position: relative; isolation: isolate; overflow: hidden; }
+  .hero-surface::before {
+    content: ""; position: absolute; inset: -20%; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(40% 50% at 20% 20%, rgb(var(--hero-glow-a)), transparent 70%),
+      radial-gradient(35% 45% at 85% 80%, rgb(var(--hero-glow-b)), transparent 70%);
+    animation: drift 18s ease-in-out infinite;
+  }
+
+  /* Leaflet panes use z-index 400+; keep them inside their own box so they never sit above dialogs. */
+  .leaflet-container { z-index: 0; isolation: isolate; }
+  .breathe-dot { animation: breathe 2.8s ease-in-out infinite; }
+  .sr-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .prose-explain { @apply max-w-prose text-[1.0625rem] leading-relaxed text-ink; }
+
+  /* Range slider (soil moisture) – thumb is styled; motion.js adds weight and magnetic snap */
+  .moisture-range { -webkit-appearance: none; appearance: none; width: 100%; height: 44px; background: transparent; cursor: grab; }
+  .moisture-range:active { cursor: grabbing; }
+  .moisture-range::-webkit-slider-runnable-track { height: 10px; border-radius: 999px; background: transparent; }
+  .moisture-range::-moz-range-track { height: 10px; border-radius: 999px; background: transparent; }
+  .moisture-range::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 28px; height: 28px; margin-top: -9px; border-radius: 50%;
+    background: rgb(var(--text-primary)); border: 3px solid rgb(var(--accent-water)); box-shadow: var(--elev-2);
+  }
+  .moisture-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: rgb(var(--text-primary)); border: 3px solid rgb(var(--accent-water)); box-shadow: var(--elev-2); }
+  .moisture-range:focus-visible { outline-offset: 4px; }
+}
+
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+@keyframes breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+@keyframes drift { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(2%,-2%,0); } }
+
+/* Reduced motion: no movement, only quick fades. Applies when the farmer chooses "Reduce" in settings, or when the device asks
+   for it and they have not chosen "Full". Motion never carries meaning alone. */
+:root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+}
+:root[data-motion="reduce"] .hero-surface::before, :root[data-motion="reduce"] .breathe-dot, :root[data-motion="reduce"] .skeleton::after { animation: none !important; }
+:root[data-motion="reduce"] .btn::after { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) *, :root:not([data-motion="full"]) *::before, :root:not([data-motion="full"]) *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+  }
+  :root:not([data-motion="full"]) .hero-surface::before, :root:not([data-motion="full"]) .breathe-dot, :root:not([data-motion="full"]) .skeleton::after { animation: none !important; }
+  :root:not([data-motion="full"]) .btn::after { display: none; }
+}

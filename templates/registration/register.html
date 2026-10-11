@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Create account · Routine Irrigation Technology{% endblock %}
+{% block body %}
+<main id="main" class="hero-surface flex min-h-dvh items-center justify-center px-4 py-10">
+  <div class="w-full max-w-md space-y-6">
+    <div class="flex flex-col items-center gap-3 text-center">
+      {% include "components/logo.html" with size="h-12 w-12" %}
+      <h1 class="text-[1.8rem] leading-tight">Start your free pilot</h1>
+      <p class="text-mute">Takes a minute. No card needed.</p>
+    </div>
+    <form method="post" class="card card-pad space-y-4" novalidate>
+      {% csrf_token %}
+      {% for f in form %}
+      <div>
+        <label class="label" for="{{ f.id_for_label }}">{{ f.label }}{% if not f.field.required %} <span class="font-normal text-mute">(optional)</span>{% endif %}</label>
+        <input id="{{ f.id_for_label }}" name="{{ f.html_name }}" value="{{ f.value|default:'' }}" class="input"
+               type="{% if f.name == 'password' %}password{% else %}text{% endif %}"
+               autocomplete="{% if f.name == 'password' %}new-password{% elif f.name == 'name' %}name{% elif f.name == 'identifier' %}username{% else %}off{% endif %}"
+               {% if f.field.required %}required{% endif %} {% if f.errors %}aria-invalid="true" aria-describedby="err-{{ f.name }}"{% endif %}>
+        {% if f.name == 'password' %}<p class="field-hint">At least 8 characters.</p>{% endif %}
+        {% if f.name == 'pilot_code' %}<p class="field-hint">Got a code from a cooperative or partner? Enter it for a longer trial.</p>{% endif %}
+        {% for e in f.errors %}<p id="err-{{ f.name }}" class="field-error">{{ e }}</p>{% endfor %}
+      </div>
+      {% endfor %}
+      <button type="submit" x-press class="btn btn-primary w-full">Create account</button>
+      <p class="text-center text-sm text-mute">Already have one? <a class="font-semibold text-water hover:underline" href="{% url 'accounts:login' %}">Sign in</a></p>
+    </form>
+  </div>
+</main>
+{% endblock %}

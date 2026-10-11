@@ -1,0 +1,33 @@
+{% extends "app.html" %}
+{% load ui humanize %}
+{% block title %}Alerts · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <header class="flex flex-wrap items-center gap-3">
+    <h1 class="text-3xl">Alerts</h1>
+    <div class="ml-auto flex flex-wrap gap-2">
+      {% if unread %}<form method="post" action="{% url 'notifications:read' %}">{% csrf_token %}<button class="btn btn-ghost min-h-[40px] text-sm" type="submit">Mark all read</button></form>{% endif %}
+      <a class="btn btn-ghost min-h-[40px] text-sm" href="{% url 'notifications:settings' %}">{% icon "settings" "h-4 w-4" %}Settings</a>
+    </div>
+  </header>
+
+  {# NotificationCenter #}
+  <ul class="space-y-3" x-stagger>
+    {% for n in items %}
+    <li class="card flex gap-3 p-4 {% if not n.read %}border-water/40{% endif %}">
+      <span class="mt-0.5 {% if n.kind == 'stress' %}text-stress{% elif n.kind == 'rain' %}text-skip{% elif n.kind == 'stale' %}text-watch{% else %}text-water{% endif %}">
+        {% if n.kind == 'stress' %}{% icon "alert" %}{% elif n.kind == 'rain' %}{% icon "cloud-rain" %}{% elif n.kind == 'stale' %}{% icon "clock" %}{% else %}{% icon "today" %}{% endif %}
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="font-semibold">{{ n.title }}{% if not n.read %} <span class="pill ml-1 bg-laterite text-onaccent">New</span>{% endif %}</p>
+        <p class="mt-0.5 text-[0.97rem] text-mute">{{ n.body }}</p>
+        <p class="mt-1 text-xs text-mute">{{ n.created|naturaltime }}</p>
+      </div>
+    </li>
+    {% empty %}
+    <li>{% include "components/empty_state.html" with title="All quiet" text="When rain is coming, stress shows up, or data gets old, we will tell you here." %}</li>
+    {% endfor %}
+  </ul>
+  <p class="text-center text-sm text-mute"><a class="underline-offset-4 hover:underline" href="{% url 'notifications:sent' %}">See SMS and WhatsApp messages (demo log)</a></p>
+</div>
+{% endblock %}

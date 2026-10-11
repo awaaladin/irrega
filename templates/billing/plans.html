@@ -1,0 +1,60 @@
+{% extends "app.html" %}
+{% load ui humanize %}
+{% block title %}Plans · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <header>
+    <h1 class="text-3xl">Plans and billing</h1>
+    <p class="mt-1 text-mute">Priced by farm size and number of fields, in Naira. <span class="text-watch">Test mode: no real money is taken in this build.</span></p>
+  </header>
+
+  {# TrialBanner (large) #}
+  <section class="card hero-surface card-pad flex flex-wrap items-center gap-4">
+    <div class="min-w-0 flex-1">
+      <p class="eyebrow">Your plan</p>
+      <h2 class="mt-1 text-2xl">{{ sub.plan.name }} {% if sub.status == 'trial' %}<span class="pill ml-2 border border-laterite/40 bg-laterite/15 text-laterite">Free pilot trial</span>{% else %}<span class="pill ml-2 border border-leaf/40 bg-leaf/15 text-leaf">Active</span>{% endif %}</h2>
+      <p class="mt-1 text-mute">
+        {% if days_left is not None %}<strong class="num text-ink">{{ days_left }}</strong> day{{ days_left|pluralize }} left in your trial. {% endif %}
+        You use <strong class="num text-ink">{{ fields_used }}</strong> of {{ sub.plan.max_fields }} fields and <strong class="num text-ink">{{ hectares }}</strong> of {{ sub.plan.max_hectares|floatformat:"-1" }} ha.
+      </p>
+    </div>
+    <a class="btn btn-ghost" href="{% url 'partners:pilot' %}">{% icon "chart" %}Pilot results</a>
+  </section>
+
+  <ul class="grid gap-5 md:grid-cols-3" x-stagger>
+    {% for p in plans %}
+    <li>
+      {# PlanCard #}
+      <article class="card flex h-full flex-col p-5 {% if p.pk == sub.plan_id %}border-water/60{% endif %}">
+        <div class="flex items-center gap-2"><h3 class="text-xl">{{ p.name }}</h3>{% if p.pk == sub.plan_id %}<span class="pill border border-water/40 bg-water/15 text-water">Current</span>{% endif %}</div>
+        <p class="mt-1 text-sm text-mute">{{ p.blurb }}</p>
+        <p class="mt-4 font-display text-4xl leading-none"><span class="text-xl text-mute">₦</span><span class="num">{{ p.price_ngn|intcomma }}</span><span class="ml-1 text-base text-mute">/ month</span></p>
+        <p class="num mt-2 text-sm text-mute">Up to {{ p.max_fields }} fields &middot; {{ p.max_hectares|floatformat:"-1" }} ha</p>
+        <ul class="mt-4 flex-1 space-y-2 text-sm">
+          {% for f in p.features %}<li class="flex gap-2"><span class="text-leaf">{% icon "check" "h-4 w-4 mt-0.5" %}</span>{{ f }}</li>{% endfor %}
+        </ul>
+        <form method="post" action="{% url 'billing:subscribe' %}" class="mt-5">
+          {% csrf_token %}<input type="hidden" name="plan" value="{{ p.code }}">
+          <button type="submit" x-press class="btn w-full {% if p.pk == sub.plan_id and sub.status == 'active' %}btn-ghost{% else %}btn-primary{% endif %}" {% if p.pk == sub.plan_id and sub.status == 'active' %}disabled{% endif %}>
+            {% if p.pk == sub.plan_id and sub.status == 'active' %}Your plan{% elif sub.status == 'trial' %}Choose {{ p.name }}{% else %}Switch to {{ p.name }}{% endif %}
+          </button>
+        </form>
+      </article>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <section class="card card-pad" aria-labelledby="inv-h">
+    <h2 id="inv-h" class="text-lg">Invoices</h2>
+    <div class="mt-3 overflow-x-auto">
+      <table class="num w-full min-w-[480px] text-left text-sm">
+        <thead class="text-mute"><tr><th class="py-2 font-medium">Date</th><th class="font-medium">Plan</th><th class="font-medium">Reference</th><th class="font-medium">Status</th><th class="text-right font-medium">Amount</th></tr></thead>
+        <tbody>
+          {% for i in invoices %}<tr class="border-t border-line"><td class="py-2.5">{{ i.created|date:"j M Y" }}</td><td>{{ i.plan.name }}</td><td class="font-mono text-xs">{{ i.reference }}</td><td>{{ i.status }}</td><td class="text-right">₦{{ i.amount_ngn|intcomma }}</td></tr>
+          {% empty %}<tr><td colspan="5" class="border-t border-line py-4 text-mute">No invoices yet. Trial days are free.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

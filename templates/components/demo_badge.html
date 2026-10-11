@@ -1,0 +1,5 @@
+{# DemoDataBadge: shown wherever simulated data is on screen. Never present fake data as real. #}
+{% load ui %}
+<span class="pill border border-watch/40 bg-watch/15 text-watch" title="This farm uses simulated sensors and a scenario forecast. It is for demonstration only.">
+  {% icon "flag" "h-3.5 w-3.5" %}{{ label|default:"Demo data" }}
+</span>

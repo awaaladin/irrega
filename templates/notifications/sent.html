@@ -1,0 +1,19 @@
+{% extends "app.html" %}
+{% load ui humanize %}
+{% block title %}Sent messages · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-6">
+  <header class="flex flex-wrap items-center gap-3"><h1 class="text-3xl">Sent messages</h1>{% include "components/demo_badge.html" with label="Demo log" %}</header>
+  <p class="text-mute">In demo mode nothing leaves the app. This is what would have been sent by SMS or WhatsApp.</p>
+  <ul class="space-y-3">
+    {% for m in items %}
+    <li class="card p-4">
+      <p class="flex flex-wrap items-center gap-2 text-sm text-mute"><span class="pill border border-line bg-sunken uppercase">{{ m.channel }}</span><span>to {{ m.to|default:"your number" }}</span><span class="ml-auto">{{ m.created|naturaltime }} &middot; {{ m.status }}</span></p>
+      <p class="mt-2">{{ m.body }}</p>
+    </li>
+    {% empty %}
+    <li>{% include "components/empty_state.html" with title="No messages yet" text="Turn on SMS or WhatsApp in alert settings, then send yourself the morning plan." href="/notifications/settings/" cta="Alert settings" %}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

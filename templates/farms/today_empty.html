@@ -1,0 +1,32 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}Today · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-2xl space-y-6">
+  <header>
+    <p class="eyebrow">Welcome, {{ request.user.display_name }}</p>
+    <h1 class="mt-1 text-[1.9rem] leading-tight sm:text-4xl">Let's set up your first field</h1>
+    <p class="mt-2 max-w-prose text-mute">Each morning this page gives you one clear decision per field: water now, water later, skip, or watch. It needs to know where your farm is and what you are growing.</p>
+  </header>
+
+  <ol class="card divide-y divide-line">
+    <li class="flex items-center gap-4 p-4">
+      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border {% if has_farm %}border-leaf bg-leaf text-onaccent{% else %}border-water text-water{% endif %}">{% if has_farm %}{% icon "check" "h-5 w-5" %}{% else %}<span class="num font-semibold">1</span>{% endif %}</span>
+      <div class="min-w-0 flex-1"><p class="font-semibold">Add your farm</p><p class="text-sm text-mute">Pin where it is, so we can get your weather forecast.</p></div>
+    </li>
+    <li class="flex items-center gap-4 p-4">
+      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border {% if has_farm %}border-water text-water{% else %}border-line text-mute{% endif %}"><span class="num font-semibold">2</span></span>
+      <div class="min-w-0 flex-1"><p class="font-semibold">Add a field</p><p class="text-sm text-mute">Crop, size, soil, planting date and how you water.</p></div>
+    </li>
+    <li class="flex items-center gap-4 p-4">
+      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line text-mute"><span class="num font-semibold">3</span></span>
+      <div class="min-w-0 flex-1"><p class="font-semibold">Get today's advice</p><p class="text-sm text-mute">Add a soil reading for a stronger answer. You always make the final call.</p></div>
+    </li>
+  </ol>
+
+  <div class="flex flex-wrap gap-3">
+    <a href="{{ next_url }}" x-press class="btn btn-primary">{% if has_farm %}Add your first field{% else %}Add your farm{% endif %}</a>
+    {% if DEMO_MODE %}<a href="{% url 'demo:enter' %}" class="btn btn-ghost">{% icon "play" %}Or look around the demo farm first</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

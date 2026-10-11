@@ -1,0 +1,85 @@
+{% extends "app.html" %}
+{% load ui static %}
+{% block title %}Insights · Routine Irrigation Technology{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <header>
+    <h1 class="text-3xl">Insights</h1>
+    <p class="mt-1 text-mute">How your fields are doing and how the advice has worked.</p>
+  </header>
+
+  <div class="grid gap-4 sm:grid-cols-3" x-stagger>
+    <div>{% include "components/stat_tile.html" with label="Water saved (30 days, estimate)" value=water_saved numeric=True unit="litres" note=baseline_note %}</div>
+    <div>{% include "components/stat_tile.html" with label="Decisions recorded" value=total_decisions numeric=True note="Accepted, snoozed or overridden" %}</div>
+    <div>{% include "components/stat_tile.html" with label="You overrode" value=override_rate numeric=True unit="%" note="Overriding is fine. It helps us learn your land." %}</div>
+  </div>
+
+  <section class="card card-pad" aria-labelledby="map-h">
+    <div class="flex flex-wrap items-center gap-2">
+      <h2 id="map-h" class="text-lg">Crop stress map</h2>
+      {% if cards.0.rec.is_demo %}{% include "components/demo_badge.html" with label="Simulated satellite" %}{% endif %}
+    </div>
+    <p class="mt-1 text-sm text-mute">Each tile is a field. Greener means healthier; amber means greenness is falling. Heat tiles work offline.</p>
+    <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {% for t in tiles %}
+      <li class="well p-3">
+        <div class="flex items-center justify-between gap-2">
+          <p class="truncate text-sm font-semibold">{{ t.card.field.name }}</p>
+          <span class="pill border {% if t.card.p.ndvi.state == 'falling' %}border-watch/40 bg-watch/15 text-watch{% else %}border-leaf/40 bg-leaf/15 text-leaf{% endif %}">
+            {% if t.card.p.ndvi.state == 'falling' %}{% icon "alert" "h-3.5 w-3.5" %}Falling{% else %}{% icon "leaf" "h-3.5 w-3.5" %}{{ t.card.p.ndvi.state|default:"no data"|capfirst }}{% endif %}
+          </span>
+        </div>
+        {# CropStressMap heat tiles: a 6 x 3 patch coloured by the last six NDVI readings #}
+        <div class="mt-3 grid grid-cols-6 gap-1" role="img" aria-label="Greenness over the last 6 readings for {{ t.card.field.name }}">
+          {% for v in t.values %}
+            {% for _ in "123" %}<span class="aspect-square rounded-[4px]" style="background: color-mix(in srgb, rgb(var(--accent-leaf)) {{ v|times100 }}%, rgb(var(--signal-watch)) ); opacity: {{ v|floatformat:2 }}"></span>{% endfor %}
+          {% endfor %}
+        </div>
+        <div class="mt-3">{% include "components/ndvi_sparkline.html" with values=t.card.ndvi_values latest=t.card.p.ndvi.latest state=t.card.p.ndvi.state simulated=t.card.p.ndvi.simulated id=t.card.field.pk %}</div>
+      </li>
+      {% endfor %}
+    </ul>
+    <div x-data="{ show: false }" class="mt-4">
+      <button type="button" class="btn btn-ghost" @click="show = !show; if (show) $nextTick(() => $dispatch('map-open'))">{% icon "map-pin" %}<span x-text="show ? 'Hide map' : 'Show on map'"></span></button>
+      <div x-show="show" x-cloak class="mt-3" x-data="fieldMap()" x-init="$watch('show', v => v && init())">
+        <div x-ref="map" class="h-72 w-full overflow-hidden rounded-md border border-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid gap-5 lg:grid-cols-2">
+    {% for c in cards %}
+    <section class="card card-pad" aria-label="{{ c.field.name }} soil moisture">
+      <div class="flex items-center gap-2">
+        <h2 class="text-lg">{{ c.field.name }}</h2>
+        <a class="ml-auto text-sm font-semibold text-water hover:underline" href="{% url 'farms:field_detail' c.field.pk %}">Open field</a>
+      </div>
+      {% include "components/rec_chart.html" with c=c %}
+    </section>
+    {% endfor %}
+  </div>
+
+  <section class="card card-pad" aria-labelledby="hist-h">
+    <h2 id="hist-h" class="text-lg">History of advice and decisions</h2>
+    <div class="mt-4">{% include "components/decision_timeline.html" with decisions=decisions show_field=True %}</div>
+  </section>
+</div>
+
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("fieldMap", () => ({
+      done: false,
+      init() {
+        if (this.done || !window.L) return;
+        this.done = true;
+        const fields = {{ map_fields|safe }};
+        const map = L.map(this.$refs.map).setView({{ farm_centre|safe }}, 16);
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Imagery &copy; Esri, Maxar, Earthstar Geographics" }).addTo(map);
+        fields.forEach((f) => L.circleMarker([f.lat, f.lon], { radius: 12, color: "#4FD1C5", weight: 3, fillOpacity: 0.3 }).addTo(map).bindPopup(f.name + " (" + f.crop + ")"));
+      },
+    }));
+  });
+</script>
+{% endblock %}

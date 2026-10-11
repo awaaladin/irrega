@@ -1,0 +1,13 @@
+{% load ui %}
+{# EmptyState: illustration + one clear next step #}
+<div class="card flex flex-col items-center gap-3 px-6 py-12 text-center">
+  <svg viewBox="0 0 120 80" class="h-24 w-36" fill="none" aria-hidden="true">
+    <path d="M10 66h100" stroke="rgb(var(--border-subtle))" stroke-width="2" stroke-linecap="round"/>
+    <path d="M60 66V38" stroke="rgb(var(--accent-leaf))" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M60 46c0-9-6-14-16-14 0 9 6 14 16 14ZM60 40c0-8 5-12 14-12 0 8-5 12-14 12Z" stroke="rgb(var(--accent-leaf))" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M92 18c4 5 7 8 7 12a7 7 0 0 1-14 0c0-4 3-7 7-12Z" stroke="rgb(var(--accent-water))" stroke-width="2.5" stroke-linejoin="round"/>
+  </svg>
+  <h2 class="text-xl">{{ title }}</h2>
+  <p class="max-w-prose text-mute">{{ text }}</p>
+  {% if href %}<a href="{{ href }}" class="btn btn-primary mt-2">{{ cta }}</a>{% endif %}
+</div>

@@ -1,0 +1,35 @@
+{% load ui %}
+{# MoistureChart: readings over 30 days with threshold bands. Text alternative + data table for screen readers. #}
+<figure class="space-y-3">
+  <svg viewBox="0 0 {{ chart.w }} {{ chart.h }}" class="w-full" role="img" aria-labelledby="mc-title-{{ field.pk }} mc-desc-{{ field.pk }}">
+    <title id="mc-title-{{ field.pk }}">Soil moisture for {{ field.name }}, last 30 days</title>
+    <desc id="mc-desc-{{ field.pk }}">{{ chart.count }} readings. Water-now line at {{ chart.trigger }} percent. {% if chart.rows %}Latest reading {{ chart.rows.0.value }} percent.{% endif %}</desc>
+    {% for b in chart.bands %}
+    <rect x="{{ chart.pad_l }}" y="{{ b.y|floatformat:1 }}" width="{{ chart.plot_w }}" height="{{ b.h|floatformat:1 }}" fill="rgb(var({% if b.tone == 'stress' %}--signal-stress{% elif b.tone == 'water' %}--accent-water{% else %}--signal-skip{% endif %}))" fill-opacity=".10"/>
+    {% endfor %}
+    {% for t in chart.ticks %}
+    <line x1="{{ chart.pad_l }}" x2="{{ chart.w }}" y1="{{ t.y|floatformat:1 }}" y2="{{ t.y|floatformat:1 }}" stroke="rgb(var(--border-subtle))" stroke-width="1"/>
+    <text x="{{ chart.pad_l|add:-6 }}" y="{{ t.y|floatformat:1 }}" text-anchor="end" dominant-baseline="middle" font-size="11" fill="rgb(var(--text-secondary))" class="num">{{ t.v }}</text>
+    {% endfor %}
+    <line x1="{{ chart.pad_l }}" x2="{{ chart.w }}" y1="{{ chart.trigger_y|floatformat:1 }}" y2="{{ chart.trigger_y|floatformat:1 }}" stroke="rgb(var(--signal-stress))" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="{{ chart.w|add:-6 }}" y="{{ chart.trigger_y|add:-6|floatformat:1 }}" text-anchor="end" font-size="11" fill="rgb(var(--signal-stress))">Water-now line {{ chart.trigger }}%</text>
+    {% if chart.d %}
+    <path d="{{ chart.d }}" fill="none" stroke="rgb(var(--chart-1))" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" x-draw data-draw-id="moist-{{ field.pk }}"/>
+    {% endif %}
+    {% for p in chart.dots|slice:"-1:" %}<circle cx="{{ p.x|floatformat:1 }}" cy="{{ p.y|floatformat:1 }}" r="4.5" fill="rgb(var(--chart-1))" stroke="rgb(var(--bg-raised))" stroke-width="2"/>{% endfor %}
+  </svg>
+  <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-mute">
+    <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-stress"></span>Too dry (below the line)</span>
+    <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-water"></span>Good range</span>
+    <span class="inline-flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-skip"></span>Waterlogged</span>
+    {% if chart.any_simulated %}<span class="text-watch">Includes simulated sensor readings</span>{% endif %}
+  </figcaption>
+  {% if not chart.d %}<p class="text-sm text-mute">Add two or more soil readings and the trend line will appear here.</p>{% endif %}
+  <details class="text-sm">
+    <summary class="flex min-h-touch cursor-pointer items-center text-mute hover:text-ink">Show readings as a table</summary>
+    <table class="num mt-2 w-full text-left">
+      <thead class="text-mute"><tr><th class="py-1 font-medium">When</th><th class="py-1 font-medium">Moisture</th><th class="py-1 font-medium">Source</th></tr></thead>
+      <tbody>{% for r in chart.rows %}<tr class="border-t border-line"><td class="py-1.5">{{ r.taken_at|date:"j M, H:i" }}</td><td>{{ r.value }}%</td><td class="capitalize">{{ r.source }}</td></tr>{% empty %}<tr><td colspan="3" class="py-2 text-mute">No readings yet.</td></tr>{% endfor %}</tbody>
+    </table>
+  </details>
+</figure>

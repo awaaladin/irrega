@@ -1,0 +1,28 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}Alert settings · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-xl space-y-6">
+  <h1 class="text-3xl">Alert settings</h1>
+  <form method="post" class="card card-pad space-y-5">
+    {% csrf_token %}
+    <fieldset class="space-y-3">
+      <legend class="label">Where should we tell you?</legend>
+      {% for name, label, on, hint in channels %}
+      <label class="flex min-h-touch cursor-pointer items-center gap-3">
+        <input type="checkbox" name="{{ name }}" {% if on %}checked{% endif %} class="peer sr-only">
+        <span class="relative h-7 w-12 shrink-0 rounded-full border border-line bg-sunken transition-colors peer-checked:border-water peer-checked:bg-water/30 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-water after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-ink after:transition-transform after:duration-300 after:ease-[cubic-bezier(.34,1.56,.64,1)] peer-checked:after:translate-x-5"></span>
+        <span><span class="block font-medium">{{ label }}</span><span class="block text-sm text-mute">{{ hint }}</span></span>
+      </label>
+      {% endfor %}
+    </fieldset>
+    <div class="grid grid-cols-2 gap-3">
+      <div><label class="label" for="qs">Quiet from</label><input id="qs" name="quiet_start" type="time" value="{{ prefs.quiet_start|time:'H:i' }}" class="input"></div>
+      <div><label class="label" for="qe">Quiet until</label><input id="qe" name="quiet_end" type="time" value="{{ prefs.quiet_end|time:'H:i' }}" class="input"></div>
+    </div>
+    <p class="field-hint">During quiet hours we only send urgent crop-stress alerts.</p>
+    <button class="btn btn-primary w-full" type="submit" x-press>Save settings</button>
+  </form>
+  <p class="text-sm text-mute">SMS and WhatsApp are in demo mode: messages are written to a log instead of being sent.</p>
+</div>
+{% endblock %}

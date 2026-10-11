@@ -1,0 +1,5 @@
+{% load ui %}{% load humanize %}
+{# DataFreshnessPill: when, and whether it is stale. Stale data is never hidden. #}
+<span class="pill border {% if stale %}border-watch/40 bg-watch/15 text-watch{% else %}border-line bg-sunken text-mute{% endif %}">
+  {% icon "clock" "h-3.5 w-3.5" %}{{ label|default:"Updated" }} {{ time|naturaltime }}{% if stale %} · out of date{% endif %}
+</span>

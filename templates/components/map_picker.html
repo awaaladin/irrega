@@ -1,0 +1,37 @@
+{% load static %}
+{# MapPicker: tap the map or drag the pin to set the location. Needs a connection for map tiles; the number fields always work. #}
+<div x-data="mapPicker({ lat: {{ lat_value|default:4.9517 }}, lon: {{ lon_value|default:8.322 }}, latInput: '{{ lat_input }}', lonInput: '{{ lon_input }}' })" x-init="init()" class="space-y-2">
+  <div x-ref="map" class="h-64 w-full overflow-hidden rounded-md border border-line bg-sunken" role="application" aria-label="Map. Tap to place the pin."></div>
+  <p class="field-hint" x-show="!ready" x-cloak>The map needs internet. You can also type the latitude and longitude below.</p>
+  <button type="button" class="btn btn-ghost min-h-[40px] text-sm" @click="locate()">Use my location</button>
+</div>
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("mapPicker", (cfg) => ({
+      ready: false, map: null, marker: null,
+      init() {
+        if (!window.L) return;
+        this.map = L.map(this.$refs.map, { zoomControl: true }).setView([cfg.lat, cfg.lon], 15);
+        L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Imagery &copy; Esri, Maxar, Earthstar Geographics" })
+          .on("load", () => (this.ready = true)).addTo(this.map);
+        this.marker = L.marker([cfg.lat, cfg.lon], { draggable: true }).addTo(this.map);
+        this.marker.on("dragend", () => this.set(this.marker.getLatLng()));
+        this.map.on("click", (e) => { this.marker.setLatLng(e.latlng); this.set(e.latlng); });
+        this.ready = navigator.onLine;
+      },
+      set(ll) {
+        const a = document.getElementById(cfg.latInput), b = document.getElementById(cfg.lonInput);
+        if (a) a.value = ll.lat.toFixed(6);
+        if (b) b.value = ll.lng.toFixed(6);
+      },
+      locate() {
+        navigator.geolocation?.getCurrentPosition((p) => {
+          const ll = { lat: p.coords.latitude, lng: p.coords.longitude };
+          this.map?.setView([ll.lat, ll.lng], 17); this.marker?.setLatLng(ll); this.set(ll);
+        });
+      },
+    }));
+  });
+</script>

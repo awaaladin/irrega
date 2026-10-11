@@ -1,0 +1,44 @@
+{% load ui %}
+{# SoilMoistureSlider: threshold bands behind the track, a thumb with weight, and a magnetic snap at the bands. #}
+{% with b=card.p.balance %}
+<section class="card card-pad" aria-labelledby="soil-h"
+         x-data="moisture({ value: {{ b.theta }}, min: 0, max: {{ moisture_max }}, snaps: {{ snaps }}, url: '{% url 'api_moisture' field.pk %}' })">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 id="soil-h" class="text-lg">Soil moisture</h2>
+    {% if card.latest %}<span class="ml-auto">{% include "components/data_freshness.html" with time=card.latest.taken_at stale=card.p.inputs.moisture_age_h|over:48 label="Last reading" %}</span>{% endif %}
+  </div>
+  <p class="mt-1 text-sm text-mute">Push a probe or finger 10 cm into the soil, then set what you find. A fresh reading makes the advice stronger.</p>
+
+  <div class="mt-4 flex items-end justify-between gap-3">
+    <p class="font-display leading-none"><span class="num text-5xl" x-text="Number(value).toFixed(1)"></span><span class="ml-1 text-xl text-mute">%</span></p>
+    <p class="num text-sm" :class="value >= {{ b.sat }} ? 'text-skip' : value < {{ b.trigger_pct }} ? 'text-stress' : 'text-leaf'" aria-live="polite">
+      <span x-show="value >= {{ b.sat }}">Waterlogged</span>
+      <span x-show="value < {{ b.trigger_pct }}">Below the water-now line</span>
+      <span x-show="value >= {{ b.trigger_pct }} && value < {{ b.sat }}">In the good range</span>
+    </p>
+  </div>
+
+  <div class="relative mt-3 px-3">
+    <div class="pointer-events-none absolute inset-x-3 top-[17px] h-[10px] overflow-hidden rounded-full">
+      <div class="absolute inset-y-0 left-0 bg-stress/30" :style="`width:${pos({{ b.trigger_pct }})}%`"></div>
+      <div class="absolute inset-y-0 bg-water/30" :style="`left:${pos({{ b.trigger_pct }})}%; width:${pos({{ b.sat }}) - pos({{ b.trigger_pct }})}%`"></div>
+      <div class="absolute inset-y-0 right-0 bg-skip/30" :style="`left:${pos({{ b.sat }})}%`"></div>
+    </div>
+    <template x-for="s in snaps" :key="s.at">
+      <span class="pointer-events-none absolute top-[10px] h-6 w-px bg-ink/50" :style="`left: calc(12px + (100% - 24px) * ${pos(s.at) / 100})`"></span>
+    </template>
+    <span x-ref="ripple" class="pointer-events-none absolute top-[8px] h-7 w-7 rounded-full bg-water/40 opacity-0" :style="`left: calc(12px + (100% - 24px) * ${pct / 100} - 14px)`"></span>
+    <input type="range" class="moisture-range relative" :min="min" :max="max" step="0.1" x-model.number="value" @input="onInput()"
+           aria-label="Soil moisture percent" :aria-valuetext="`${value} percent`">
+  </div>
+  <div class="relative mx-3 mt-1 h-4 text-[11px] text-mute">
+    <template x-for="s in snaps" :key="'l'+s.at"><span class="absolute -translate-x-1/2 whitespace-nowrap" :style="`left:${pos(s.at)}%`" x-text="s.label"></span></template>
+  </div>
+
+  <div class="mt-5 flex flex-wrap items-center gap-2">
+    <button type="button" class="btn btn-ghost min-w-touch px-0" @click="step(-1)" aria-label="Lower by 1 percent">{% icon "minus" %}</button>
+    <button type="button" class="btn btn-ghost min-w-touch px-0" @click="step(1)" aria-label="Raise by 1 percent">{% icon "plus" %}</button>
+    <button type="button" x-press class="btn btn-water ml-auto" :data-loading="saving" @click="save()">{% icon "check" %}<span x-text="saved ? 'Saved' : 'Save reading'"></span></button>
+  </div>
+</section>
+{% endwith %}

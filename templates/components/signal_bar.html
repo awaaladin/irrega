@@ -1,0 +1,18 @@
+{% load ui %}
+{# SignalBar: one signal with its share of the decision. direction: irrigate | skip | neutral #}
+<li class="grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1.5">
+  <div class="flex min-w-0 items-center gap-2">
+    <span class="{% if s.direction == 'irrigate' %}text-water{% elif s.direction == 'skip' %}text-skip{% else %}text-mute{% endif %}">
+      {% if s.direction == 'irrigate' %}{% icon "drop" "h-4 w-4" %}{% elif s.direction == 'skip' %}{% icon "cloud-rain" "h-4 w-4" %}{% else %}{% icon "minus" "h-4 w-4" %}{% endif %}
+    </span>
+    <span class="truncate text-sm font-medium">{{ s.label }}</span>
+  </div>
+  <span class="num text-sm text-mute">{{ s.share|times100 }}%</span>
+  <div class="col-span-2 h-2 overflow-hidden rounded-full bg-sunken" role="presentation">
+    <div x-grow data-delay="{{ delay|default:0 }}" class="h-full rounded-full {% if s.direction == 'irrigate' %}bg-water{% elif s.direction == 'skip' %}bg-skip{% else %}bg-mute/50{% endif %}" style="width: {{ s.share|times100|default:1 }}%"></div>
+  </div>
+  <p class="col-span-2 text-sm text-mute">
+    <span class="{{ s.status|status_tone|tone_text }}">{{ s.display }}</span>
+    <span class="sr-only">. Pushes toward {% if s.direction == 'irrigate' %}watering{% elif s.direction == 'skip' %}skipping{% else %}neither{% endif %}, {{ s.share|times100 }} percent of the decision.</span>
+  </p>
+</li>

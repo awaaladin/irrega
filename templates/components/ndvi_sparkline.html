@@ -1,0 +1,16 @@
+{% load ui %}
+{# NdviSparkline: crop greenness over time. Always says when it is simulated. #}
+{% sparkline values 120 32 as path %}
+<div class="flex items-center gap-3">
+  <svg viewBox="0 0 120 32" class="h-8 w-[120px] overflow-visible" role="img" aria-label="Greenness trend: {{ state|default:'unknown' }}, latest {{ latest|default:'no data' }}">
+    {% if path %}
+    <path d="{{ path }}" fill="none" stroke="rgb(var({% if state == 'falling' %}--signal-watch{% else %}--accent-leaf{% endif %}))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x-draw data-draw-id="ndvi-{{ id|default:'x' }}"/>
+    {% else %}
+    <line x1="0" y1="16" x2="120" y2="16" stroke="rgb(var(--border-subtle))" stroke-dasharray="3 4"/>
+    {% endif %}
+  </svg>
+  <div class="num text-sm leading-tight">
+    <p class="font-semibold">{% if latest %}{{ latest|floatformat:2 }}{% else %}No data{% endif %}</p>
+    <p class="text-mute">{{ state|default:"" }}{% if simulated %} · simulated{% endif %}</p>
+  </div>
+</div>

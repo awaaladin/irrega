@@ -1,0 +1,3 @@
+{% load ui %}{% action_meta action lang|default:"en" as m %}
+{# ActionBadge: colour + icon + label, so colour is never the only signal #}
+<span class="pill border {{ m.classes }} {% if big %}px-3.5 py-1.5 text-sm{% endif %}">{% icon m.icon "h-4 w-4" %}{{ m.label }}</span>

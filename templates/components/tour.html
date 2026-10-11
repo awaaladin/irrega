@@ -1,0 +1,24 @@
+{% load ui %}
+{# Judge walkthrough: problem -> recommendation -> Why -> override -> ask -> partner view. Optional overlay. #}
+<div x-data="tour([
+  { title: 'The problem', body: 'Small farms in Calabar South water by guesswork: too much wastes water and washes nutrients away, too little costs harvest. Routine Irrigation Technology gives one clear decision per field, every morning.', href: '/' },
+  { title: 'One decision per field', body: 'Each card answers in two seconds: water now, later, skip, or watch. It shows how much, when, and how sure we are. Everything here is labelled Demo data.', href: '/' },
+  { title: 'Why this?', body: 'Open Why this? to see plain-language reasons, the signals that pushed the decision, and what happens if you wait a day.', href: '/' },
+  { title: 'You stay in control', body: 'Accept, snooze, or override with your own litres and a reason. Every choice is saved in an immutable history, and the system only suggests changes, never makes them silently.', href: '/' },
+  { title: 'Switch the weather', body: 'Use the demo bar to switch to a Rainy day or a Dry spell and watch the advice change live. Under rain, the tomato bed with falling greenness is a WATCH, not more water.', href: '/' },
+  { title: 'Ask a question', body: 'Ask anything about a field. Answers are grounded in its own readings and forecast, and the assistant says when it does not know.', href: '/farms/' },
+  { title: 'Partner view', body: 'Cooperatives and irrigation providers see usage, water saved, override rates and data-quality flags across the farms they support.', href: '/partners/' }
+])" x-cloak x-show="$store.ui.tour" class="fixed inset-x-0 bottom-20 z-toast flex justify-center px-4 md:bottom-6" role="dialog" aria-label="Judge walkthrough" aria-live="polite">
+  <div class="card w-full max-w-lg border-water/40 p-5 shadow-float" x-rise>
+    <div class="flex items-center gap-2">
+      <span class="eyebrow text-water">Walkthrough &middot; <span class="num" x-text="`${i + 1} of ${steps.length}`"></span></span>
+      <button type="button" class="btn btn-quiet ml-auto -mr-2 min-w-touch px-2" @click="end()" aria-label="End walkthrough">{% icon "x" %}</button>
+    </div>
+    <h2 class="mt-1 text-xl" x-text="step.title"></h2>
+    <p class="mt-1.5 text-[0.97rem] leading-relaxed text-mute" x-text="step.body"></p>
+    <div class="mt-4 flex gap-2">
+      <button type="button" class="btn btn-ghost" @click="prev()" :disabled="i === 0">Back</button>
+      <button type="button" x-press class="btn btn-primary ml-auto" @click="next()" x-text="i === steps.length - 1 ? 'Finish' : 'Next'"></button>
+    </div>
+  </div>
+</div>

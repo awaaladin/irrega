@@ -1,0 +1,21 @@
+{% load ui humanize %}
+{# DecisionTimeline: what we advised and what the farmer did. Immutable log. #}
+<ol class="relative space-y-4 border-l border-line pl-5">
+  {% for d in decisions %}
+  <li class="relative">
+    <span class="absolute -left-[27px] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-base {% if d.kind == 'accept' %}bg-leaf{% elif d.kind == 'override' %}bg-laterite{% else %}bg-mute{% endif %}"></span>
+    <p class="text-sm text-mute"><time datetime="{{ d.created|date:'c' }}">{{ d.created|date:"j M, H:i" }}</time>{% if show_field %} &middot; {{ d.recommendation.field.name }}{% endif %}</p>
+    <p class="mt-0.5">
+      {% action_meta d.recommendation.action lang|default:"en" as m %}
+      <span class="font-medium">We said: {{ m.label|lower }}.</span>
+      {% if d.kind == 'accept' %}You accepted.{% elif d.kind == 'snooze' %}You snoozed it.{% else %}
+        You chose to {% if d.farmer_action == 'IRRIGATE' %}water{% if d.litres %} {{ d.litres|num }} litres{% endif %}{% elif d.farmer_action == 'SKIP' %}skip{% else %}water at a different time{% endif %}.
+      {% endif %}
+      {% if d.reason %}<span class="text-mute">Reason: {{ d.reason|unscore }}.</span>{% endif %}
+    </p>
+    {% if d.note %}<p class="mt-0.5 text-sm text-mute">"{{ d.note }}"</p>{% endif %}
+  </li>
+  {% empty %}
+  <li class="text-sm text-mute">Nothing here yet. When you accept or override advice, it is saved here.</li>
+  {% endfor %}
+</ol>

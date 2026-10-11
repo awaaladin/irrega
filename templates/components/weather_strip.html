@@ -1,0 +1,25 @@
+{% load ui humanize %}
+{# WeatherStrip: next 5 days, rain probability emphasised #}
+<section class="card card-pad" aria-labelledby="weather-h">
+  <div class="mb-3 flex flex-wrap items-center gap-2">
+    <h2 id="weather-h" class="text-lg">Next 5 days</h2>
+    <span class="ml-auto flex flex-wrap items-center gap-2">
+      {% if weather.demo %}{% include "components/demo_badge.html" with label="Scenario forecast" %}{% endif %}
+      {% include "components/data_freshness.html" with time=weather.fetched stale=weather.stale label="Forecast" %}
+    </span>
+  </div>
+  <ul class="grid grid-cols-5 gap-2 sm:gap-3" x-stagger>
+    {% for d in weather.days %}
+    <li class="flex flex-col items-center gap-1.5 rounded-md border {% if d.heavy %}border-skip/40 bg-skip/10{% else %}border-line bg-sunken/50{% endif %} px-1 py-3 text-center">
+      <span class="text-xs font-semibold uppercase tracking-wide text-mute">{{ d.dow }}</span>
+      {% include "components/rain_dial.html" with prob=d.rain_prob uid=forloop.counter size=52 %}
+      <span class="num text-sm font-semibold">{{ d.rain_mm|floatformat:0 }} mm</span>
+      <span class="num text-xs text-mute">{{ d.tmax|floatformat:0 }}° / {{ d.tmin|floatformat:0 }}°</span>
+      {% if d.heavy %}<span class="sr-only">Rain likely</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% if weather.stale %}
+  <p class="mt-3 flex items-center gap-2 text-sm text-watch">{% icon "alert" "h-4 w-4" %}This forecast is more than 6 hours old, so advice confidence is lower.</p>
+  {% endif %}
+</section>

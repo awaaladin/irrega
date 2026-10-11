@@ -1,0 +1,26 @@
+{% load ui %}
+{# CommandPalette: Ctrl/Cmd+K. Arrow keys, Enter, Esc. Focus is trapped in the dialog. #}
+<div x-cloak x-show="$store.ui.palette" x-data="palette([
+    {label:'Today',href:'/'},{label:'Fields',href:'/farms/'},{label:'Add a farm or field',href:'/farms/onboarding/'},
+    {label:'Insights',href:'/insights/'},{label:'Alerts',href:'/notifications/'},{label:'Alert settings',href:'/notifications/settings/'},
+    {label:'Sent messages (demo log)',href:'/notifications/sent/'},{label:'Plans and billing',href:'/billing/'},{label:'Pilot results',href:'/pilot/'},
+    {label:'Account',href:'/account/'},{label:'Design gallery',href:'/design/'}{% if request.user.is_partner %},{label:'Partner dashboard',href:'/partners/'}{% endif %}])"
+     @keydown.escape.window="$store.ui.palette = false"
+     class="fixed inset-0 z-palette flex items-start justify-center bg-base/70 p-4 pt-[12vh] backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="absolute inset-0" @click="$store.ui.palette = false"></div>
+  <div class="card relative w-full max-w-lg overflow-hidden shadow-float" x-effect="if ($store.ui.palette) $nextTick(() => $refs.q && $refs.q.focus())">
+    <label class="flex items-center gap-3 border-b border-line px-4">
+      <span class="text-mute">{% icon "search" %}</span>
+      <input x-ref="q" x-model="q" @input="sel = 0" @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="go(results[sel])"
+             class="min-h-[52px] flex-1 bg-transparent text-base outline-none placeholder:text-mute" placeholder="Go to…" aria-label="Search pages">
+    </label>
+    <ul class="max-h-72 overflow-y-auto p-2" role="listbox">
+      <template x-for="(r, i) in results" :key="r.href">
+        <li role="option" :aria-selected="i === sel">
+          <a :href="r.href" class="flex min-h-touch items-center rounded-md px-3 text-sm" :class="i === sel ? 'bg-sunken text-ink' : 'text-mute'" @mouseenter="sel = i" x-text="r.label"></a>
+        </li>
+      </template>
+      <li x-show="results.length === 0" class="px-3 py-6 text-center text-sm text-mute">Nothing matches that. Try a shorter word.</li>
+    </ul>
+  </div>
+</div>

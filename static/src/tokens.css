@@ -1,0 +1,83 @@
+/* Design tokens. Colours are space-separated RGB channels so Tailwind can apply opacity.
+   Dark "Estuary Night" is the default shell; light "Harmattan Paper" is the alternative. */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-base: 11 26 25;
+  --bg-raised: 17 36 35;
+  --bg-sunken: 8 19 18;
+  --border-subtle: 30 56 53;
+  --text-primary: 234 242 236;
+  --text-secondary: 157 181 174;
+  --accent-water: 79 209 197;
+  --accent-laterite: 217 115 63;
+  --accent-leaf: 183 216 75;
+  --signal-skip: 143 167 255;
+  --signal-watch: 242 193 78;
+  --signal-stress: 229 96 77;
+  --on-accent: 11 26 25; /* text on filled accent buttons */
+  /* Colourblind-safe chart set (validated for deuteranopia/protanopia separation by lightness + hue). */
+  --chart-1: 79 209 197;
+  --chart-2: 242 193 78;
+  --chart-3: 143 167 255;
+  --chart-4: 217 115 63;
+  --elev-1: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 1px 2px rgb(0 0 0 / 0.30), 0 6px 16px -8px rgb(0 0 0 / 0.40);
+  --elev-2: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 2px 4px rgb(0 0 0 / 0.30), 0 14px 32px -12px rgb(0 0 0 / 0.55);
+  --elev-3: 0 1px 0 rgb(255 255 255 / 0.07) inset, 0 -12px 40px -12px rgb(0 0 0 / 0.6);
+  --hero-glow-a: 79 209 197 / 0.10;
+  --hero-glow-b: 217 115 63 / 0.10;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-base: 246 241 231;
+  --bg-raised: 251 248 241;
+  --bg-sunken: 237 230 214;
+  --border-subtle: 221 211 190;
+  --text-primary: 26 36 33;
+  --text-secondary: 86 101 95;
+  --accent-water: 14 124 116;
+  --accent-laterite: 180 83 42;
+  --accent-leaf: 94 120 12; /* darkened from 6E8C14 so leaf text passes AA on paper */
+  --signal-skip: 68 88 201;
+  --signal-watch: 138 99 0; /* darkened from A87A06 for AA text */
+  --signal-stress: 181 58 40;
+  --on-accent: 255 255 255;
+  --chart-1: 14 124 116;
+  --chart-2: 138 99 0;
+  --chart-3: 68 88 201;
+  --chart-4: 180 83 42;
+  --elev-1: 0 1px 0 rgb(255 255 255 / 0.7) inset, 0 1px 2px rgb(60 40 10 / 0.08), 0 6px 16px -8px rgb(60 40 10 / 0.16);
+  --elev-2: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 2px 4px rgb(60 40 10 / 0.08), 0 14px 32px -12px rgb(60 40 10 / 0.22);
+  --elev-3: 0 1px 0 rgb(255 255 255 / 0.9) inset, 0 -12px 40px -12px rgb(60 40 10 / 0.25);
+  --hero-glow-a: 14 124 116 / 0.10;
+  --hero-glow-b: 180 83 42 / 0.10;
+}
+
+:root {
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter Tight Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, Consolas, monospace;
+
+  /* 4px spacing scale lives in Tailwind (1 = 4px). Radii: 6 / 10 / 16 / 24. */
+  --z-nav: 30;
+  --z-sheet: 50;
+  --z-palette: 60;
+  --z-toast: 70;
+
+  /* Motion. Springs are used by static/js/motion.js; tweens only for opacity/colour. */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 360ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-hero: clamp(2.5rem, 8vw, 4rem);
+}

@@ -1,0 +1,25 @@
+# One-command local start:  docker compose up --build   then open http://localhost:8000
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: irrigation
+      POSTGRES_USER: irrigation
+      POSTGRES_PASSWORD: irrigation
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U irrigation"]
+      interval: 3s
+      retries: 20
+  web:
+    build: .
+    env_file: [{ path: .env, required: false }]
+    environment:
+      DATABASE_URL: postgres://irrigation:irrigation@db:5432/irrigation
+      DEBUG: "0"
+      ALLOWED_HOSTS: "*"
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+volumes:
+  pgdata:

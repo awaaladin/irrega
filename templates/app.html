@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block body %}
+{# AppShell: collapsible sidebar + command palette on desktop, bottom tab bar on mobile #}
+<div class="min-h-dvh md:grid md:grid-cols-[auto_1fr]" x-data="{ collapsed: false }">
+
+  {# SidebarNav #}
+  <aside class="sticky top-0 hidden h-dvh flex-col border-r border-line bg-sunken/60 p-3 md:flex" :class="collapsed ? 'w-[72px]' : 'w-64'" aria-label="Main">
+    <a href="/" class="flex items-center gap-3 rounded-md p-2" aria-label="Routine Irrigation Technology, home">
+      {% include "components/logo.html" with size="h-9 w-9" %}
+      <span x-show="!collapsed" class="font-display text-lg leading-tight">Routine<br>Irrigation</span>
+    </a>
+    <nav class="mt-6 flex flex-1 flex-col gap-1">
+      {% for item in nav_items %}
+      <a href="{{ item.href }}" x-press
+         class="group relative flex min-h-touch items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors {% if active == item.label %}bg-raised text-ink shadow-raised{% else %}text-mute hover:bg-raised/60 hover:text-ink{% endif %}"
+         {% if active == item.label %}aria-current="page"{% endif %}>
+        {% if active == item.label %}<span class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-water"></span>{% endif %}
+        {% icon item.icon %}
+        <span x-show="!collapsed">{{ item.label }}</span>
+        {% if item.label == 'Alerts' and unread_count %}<span class="num ml-auto rounded-full bg-laterite px-2 text-xs font-semibold text-onaccent" x-show="!collapsed">{{ unread_count }}</span>{% endif %}
+      </a>
+      {% endfor %}
+      {% if request.user.is_partner %}
+      <a href="/partners/" class="flex min-h-touch items-center gap-3 rounded-md px-3 text-sm font-medium {% if active == 'Partner' %}bg-raised text-ink{% else %}text-mute hover:text-ink{% endif %}">{% icon "users" %}<span x-show="!collapsed">Partner</span></a>
+      {% endif %}
+      {% if request.user.is_staff or request.user.role == 'admin' %}
+      <a href="/system/" class="flex min-h-touch items-center gap-3 rounded-md px-3 text-sm font-medium {% if active == 'System' %}bg-raised text-ink{% else %}text-mute hover:text-ink{% endif %}">{% icon "shield" %}<span x-show="!collapsed">System</span></a>
+      {% endif %}
+    </nav>
+    <button type="button" class="btn btn-ghost mb-2 justify-start text-mute" @click="$store.ui.palette = true">
+      {% icon "search" %}<span x-show="!collapsed" class="flex-1 text-left">Search</span><kbd x-show="!collapsed" class="num rounded border border-line px-1.5 text-xs">Ctrl K</kbd>
+    </button>
+    <button type="button" class="btn btn-quiet justify-start" @click="collapsed = !collapsed" :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+      <span :class="collapsed ? '' : 'rotate-180'">{% icon "chevron-right" %}</span><span x-show="!collapsed">Collapse</span>
+    </button>
+  </aside>
+
+  <div class="min-w-0 pb-24 md:pb-10">
+    {# Top bar #}
+    <header class="sticky top-0 z-nav flex items-center gap-2 border-b border-line bg-base/85 px-4 py-2 backdrop-blur md:px-8">
+      <a href="/" class="md:hidden" aria-label="Home">{% include "components/logo.html" with size="h-8 w-8" %}</a>
+      <div class="min-w-0 flex-1">
+        <p class="eyebrow truncate">{% now "l, j F" %} &middot; Calabar South</p>
+      </div>
+      {% if has_demo_farm %}{% include "components/demo_badge.html" %}{% endif %}
+      {% include "components/language_toggle.html" %}
+      {% include "components/theme_toggle.html" %}
+      <a href="/notifications/" class="btn btn-quiet relative min-w-touch px-2" aria-label="Alerts{% if unread_count %}, {{ unread_count }} unread{% endif %}">
+        {% icon "bell" %}{% if unread_count %}<span class="absolute right-1.5 top-2 h-2 w-2 rounded-full bg-laterite breathe-dot"></span>{% endif %}
+      </a>
+    </header>
+
+    {% include "components/offline_banner.html" %}
+    {% if trial_days is not None %}{% include "components/trial_banner.html" %}{% endif %}
+
+    <main id="main" class="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8" tabindex="-1">
+      {% if messages %}{% for m in messages %}<div class="card card-pad mb-4 text-sm" role="status">{{ m }}</div>{% endfor %}{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  {# BottomTabBar (mobile) #}
+  <nav class="fixed inset-x-0 bottom-0 z-nav border-t border-line bg-base/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden" aria-label="Main">
+    <ul class="grid grid-cols-5">
+      {% for item in nav_items %}
+      <li>
+        <a href="{{ item.href }}" x-press class="relative flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium {% if active == item.label %}text-water{% else %}text-mute{% endif %}" {% if active == item.label %}aria-current="page"{% endif %}>
+          {% icon item.icon "h-6 w-6" %}{{ item.label }}
+          {% if item.label == 'Alerts' and unread_count %}<span class="num absolute right-[26%] top-1.5 rounded-full bg-laterite px-1.5 text-[10px] font-bold text-onaccent">{{ unread_count }}</span>{% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</div>
+
+{% include "components/command_palette.html" %}
+{% if has_demo_farm %}{% include "components/tour.html" %}{% endif %}
+{% endblock %}

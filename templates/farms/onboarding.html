@@ -1,0 +1,26 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}Add your farm · Routine Irrigation Technology{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-2xl space-y-6">
+  <header>
+    <p class="eyebrow">Step 1 of 2</p>
+    <h1 class="mt-1 text-3xl">Where is your farm?</h1>
+    <p class="mt-1.5 text-mute">We use the location to get the weather forecast for your exact spot. Tap the map or type the coordinates. Calabar South is the starting point.</p>
+  </header>
+  <form method="post" class="card card-pad space-y-5" novalidate>
+    {% csrf_token %}
+    <div>
+      <label class="label" for="{{ form.name.id_for_label }}">Farm name</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+    </div>
+    {% include "components/map_picker.html" with lat_input=form.latitude.id_for_label lon_input=form.longitude.id_for_label lat_value=form.latitude.value lon_value=form.longitude.value %}
+    <div class="grid grid-cols-2 gap-3">
+      <div><label class="label" for="{{ form.latitude.id_for_label }}">Latitude</label>{{ form.latitude }}{% for e in form.latitude.errors %}<p class="field-error">{{ e }}</p>{% endfor %}</div>
+      <div><label class="label" for="{{ form.longitude.id_for_label }}">Longitude</label>{{ form.longitude }}{% for e in form.longitude.errors %}<p class="field-error">{{ e }}</p>{% endfor %}</div>
+    </div>
+    <button class="btn btn-primary w-full" type="submit" x-press>Continue to your first field</button>
+  </form>
+</div>
+{% endblock %}

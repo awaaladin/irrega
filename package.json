@@ -1,0 +1,27 @@
+{
+  "name": "routine-irrigation-technology",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/inter-tight": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@tailwindcss/forms": "^0.5.11",
+    "alpinejs": "^3.17.4",
+    "leaflet": "^1.9.4",
+    "motion": "^14.0.0",
+    "tailwindcss": "^3.4.19"
+  },
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs && node scripts/vendor-motion.mjs",
+    "build:css": "tailwindcss -i static/src/input.css -o static/css/app.css --minify",
+    "watch:css": "tailwindcss -i static/src/input.css -o static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

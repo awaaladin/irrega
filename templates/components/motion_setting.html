@@ -1,0 +1,19 @@
+{% load ui %}
+{# MotionSetting: lets the farmer turn animation down regardless of the device. Saved on this device. #}
+<fieldset class="space-y-3">
+  <legend class="label">Animation and movement</legend>
+  <div class="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Animation and movement">
+    {% for value, title, hint in options %}
+    <label class="relative flex min-h-[64px] cursor-pointer flex-col justify-center rounded-md border border-line bg-sunken px-3 py-2 transition-colors hover:border-water/50 has-[:checked]:border-water has-[:checked]:bg-water/10 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-water">
+      <input type="radio" name="motion" value="{{ value }}" class="sr-only" :checked="$store.ui.motion === '{{ value }}'" @change="$store.ui.setMotion('{{ value }}')">
+      <span class="text-sm font-semibold">{{ title }}</span>
+      <span class="text-xs text-mute">{{ hint }}</span>
+    </label>
+    {% endfor %}
+  </div>
+  <p class="field-hint" aria-live="polite">
+    <span x-show="$store.ui.motion === 'reduce'" x-cloak>Buttons, cards and charts will fade instead of moving, and numbers will not count up.</span>
+    <span x-show="$store.ui.motion === 'system'" x-cloak>We follow your phone or computer's "reduce motion" setting.</span>
+    <span x-show="$store.ui.motion === 'full'" x-cloak>Full animation, even if your device asks for less.</span>
+  </p>
+</fieldset>

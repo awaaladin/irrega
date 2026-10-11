@@ -1,0 +1,45 @@
+{% load ui %}
+{# WhyPanel: headline -> reasons -> signal detail (progressive disclosure). p = presented recommendation. #}
+<section class="space-y-5" aria-label="Why this advice">
+  <p class="prose-explain font-display text-[1.2rem] leading-snug">{{ p.headline }}</p>
+
+  <ol class="space-y-2.5">
+    {% for t in p.reason_texts %}
+    <li class="flex gap-3 text-[0.97rem] leading-relaxed">
+      <span class="num mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line text-xs text-mute">{{ forloop.counter }}</span>
+      <span class="max-w-prose">{{ t }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+
+  <div class="well p-4">
+    <h4 class="eyebrow mb-1 flex items-center gap-2">{% icon "clock" "h-4 w-4" %}If you wait 24 hours</h4>
+    <p class="max-w-prose text-[0.97rem]">{{ p.what_if_text }}</p>
+  </div>
+
+  {% include "components/signal_breakdown.html" with signals=p.signals %}
+
+  {% if p.confidence_notes %}
+  <div class="rounded-md border border-watch/30 bg-watch/10 p-3 text-sm">
+    <p class="font-semibold">Why confidence is {{ p.confidence|lower }}</p>
+    <ul class="mt-1 list-inside list-disc text-mute">{% for n in p.confidence_notes %}<li>{{ n }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <details class="group text-sm">
+    <summary class="flex min-h-touch cursor-pointer items-center gap-2 font-medium text-mute hover:text-ink">{% icon "chevron-right" "h-4 w-4 transition-transform group-open:rotate-90" %}Show the water numbers</summary>
+    {% with b=p.balance %}
+    <dl class="num mt-2 grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3">
+      <div><dt class="text-mute">Soil moisture</dt><dd>{{ b.theta }}%</dd></div>
+      <div><dt class="text-mute">Water-now line</dt><dd>{{ b.trigger_pct }}%</dd></div>
+      <div><dt class="text-mute">Used so far</dt><dd>{{ b.depletion_mm }} mm</dd></div>
+      <div><dt class="text-mute">Crop use today</dt><dd>{{ b.etc_mm }} mm</dd></div>
+      <div><dt class="text-mute">Rain counted today</dt><dd>{{ b.rain_today_mm }} mm</dd></div>
+      <div><dt class="text-mute">Rain counted tomorrow</dt><dd>{{ b.rain_tomorrow_mm }} mm</dd></div>
+      <div><dt class="text-mute">Crop can use before stress</dt><dd>{{ b.raw_mm }} mm</dd></div>
+      <div><dt class="text-mute">Expected tonight</dt><dd>{{ b.end_today_mm }} mm</dd></div>
+      <div><dt class="text-mute">Expected tomorrow night</dt><dd>{{ b.end_tomorrow_mm }} mm</dd></div>
+    </dl>
+    {% endwith %}
+  </details>
+</section>

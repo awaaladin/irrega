@@ -1,0 +1,14 @@
+{% load ui %}
+{# ConfidenceMeter: three segments + words. level = High | Medium | Low. Segments fill in sequence. #}
+<div class="flex items-center gap-2" role="img" aria-label="Confidence: {{ level }}">
+  <div class="flex gap-1">
+    {% for i in "123" %}
+    <span class="relative h-2 w-7 overflow-hidden rounded-full bg-sunken">
+      {% if level == 'High' or level == 'Medium' and forloop.counter <= 2 or level == 'Low' and forloop.counter == 1 %}
+      <span x-grow data-delay="{{ forloop.counter0|mul:0.12 }}" class="absolute inset-0 rounded-full {% if level == 'High' %}bg-leaf{% elif level == 'Medium' %}bg-watch{% else %}bg-stress{% endif %}"></span>
+      {% endif %}
+    </span>
+    {% endfor %}
+  </div>
+  <span class="text-sm font-medium {% if level == 'Low' %}text-stress{% endif %}">{{ level }} confidence</span>
+</div>
